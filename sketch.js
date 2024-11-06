@@ -84,7 +84,7 @@ function draw() {
       }
       break;
 //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-    case 2:
+    case 2://TASKS
       // Stage 2 content (View tasks screen)
       background(200); // Clear the screen to ensure Stage 2 disappears completely
       fill(255);
@@ -136,11 +136,11 @@ function draw() {
   background(255); 
 
   // Resize desk image proportionally (new variable names to avoid conflict)
-  let deskWidth3 = windowWidth * 0.9; // desks takes up 90% of screen
+  let deskWidth3 = windowWidth * 1.2; // desks takes up 90% of screen
   let deskHeight3 = desk.height * (deskWidth3 / desk.width); //  height proportional
 
 
-  image(desk, 20, -100, deskWidth3, deskHeight3);
+  image(desk, -300, -410, deskWidth3, deskHeight3);
 
 
 
@@ -153,9 +153,9 @@ function draw() {
 //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     case 4: // Discussion Board stage content
       background(200); 
-      let deskWidth4 = windowWidth * 0.9; 
-      let deskHeight4 = desk.height * (deskWidth3 / desk.width); 
-      image(desk, 20, -100, deskWidth3, deskHeight3);
+      let deskWidth4 = windowWidth * 1.2; 
+      let deskHeight4 = desk.height * (deskWidth4 / desk.width); 
+      image(desk, -300, -410, deskWidth4, deskHeight4);
 
       fill(0);
       textSize(32);
