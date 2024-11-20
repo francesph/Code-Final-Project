@@ -5,6 +5,13 @@ let discuss;
 let poster;
 let sketch;
 let tasks;
+let taskList = [
+  { task: "500-word Essay", stage: 4 },
+  { task: "Discussion Board", stage: 5 },
+  { task: "Art Sketch", stage: 6 },
+  { task: "Poster", stage: 7 }
+];
+let tasksIcon;
 
 let stage = 0;
 let prevStage = 0;  
@@ -22,6 +29,7 @@ function preload() {
   poster = loadImage('assets/poster.png');
   tasks = loadImage('assets/tasks1.png');
   sketch = loadImage('assets/sketch.png');
+  tasksIcon = loadImage('assets/tasks button.png');
 }
 //===============================================================================================================================================================
 function setup() {
@@ -193,26 +201,56 @@ function drawTasksStage() {
   let tasksY = (windowHeight - tasksHeight) / 2;  // Center vertically
   image(tasks, tasksX, tasksY, tasksWidth, tasksHeight);  // Display the larger tasks image
 
-  // Display some text and mouse coordinates for debugging
-  textAlign(CENTER, CENTER);
+  let taskY = windowHeight * 0.25;  // Initial vertical position for tasks (moved down)
+  let lineSpacing = 42;  // Decreased line spacing (less vertical distance between tasks)
+  textAlign(LEFT, TOP);
   fill("black");
-  textSize(32);
-  text("x:" + mouseX + " y:" + mouseY, 100, 100);  // Show mouse position
+  textSize(26);
 
-  // Buttons for Essay, Discussion, Art Sketch, Poster
-  drawButton(600, 220, 300, 40, "essay", () => { stage = 4; });
-  drawButton(600, 270, 300, 40, "discussion board", () => { stage = 5; });
-  drawButton(600, 320, 300, 40, "art sketch", () => { stage = 6; });
-  drawButton(600, 370, 300, 40, "poster", () => { stage = 7; });
+  for (let i = 0; i < taskList.length; i++) {
+    let task = taskList[i];
+
+    // Calculate position for text with reduced spacing
+    let buttonWidth = 300;
+    let buttonX = windowWidth / 2 - buttonWidth / 2;
+    let buttonY = taskY + i * lineSpacing;  // Updated to use reduced lineSpacing
+
+    // Check if mouse is over the text
+    let isHovered = mouseX >= buttonX && mouseX <= buttonX + buttonWidth &&
+                    mouseY >= buttonY && mouseY <= buttonY + lineSpacing;  // Adjusted height for the hover area
+
+    // Set the text color based on hover state
+    fill(isHovered ? "#F2A6C8" : "black");  // Change text color on hover
+
+    // Draw the task text
+    text(task.task, buttonX + 10, buttonY + 10);
+
+    // Handle task click
+    if (isHovered && mouseIsPressed) {
+      // Change the stage to the corresponding one
+      stage = task.stage;
+
+      // Remove the task from the list after clicking
+      taskList.splice(i, 1); // Remove the clicked task from the list
+    }
+  }
 
   // Draw the back button
   drawBackButton();
 }
-
 //===============================================================================================================================================================
 function drawEssayStage() {
   background(255);
+
+  if (videoStarted) {
+    let sunriseWidth = windowWidth * 0.5;
+    let sunriseHeight = sunrise.height * (sunriseWidth / sunrise.width);
+    image(sunrise, -450, -20, sunriseWidth * 1.2, sunriseHeight * 1.2);  // Display video in top-left corner
+  }
+  
   image(essay, 0, 0, width, height);
+
+  image(tasksIcon, 20, 20,width, height);
 
   // Show the input field for the essay stage
   essayInput.show();
@@ -229,8 +267,15 @@ function drawEssayStage() {
 //===============================================================================================================================================================
 function drawDiscussionStage() {
   background(200);
-  image(discuss, 0, 0, width, height);
 
+  if (videoStarted) {
+    let sunriseWidth = windowWidth * 0.5;
+    let sunriseHeight = sunrise.height * (sunriseWidth / sunrise.width);
+    image(sunrise, -450, -20, sunriseWidth * 1.2, sunriseHeight * 1.2);  // Display video in top-left corner
+  }
+  
+  image(discuss, 0, 0, width, height);
+  image(tasksIcon, 20, 20,width, height);
   // Show the input field for the discussion stage
   discussInput.show();
 
@@ -246,14 +291,22 @@ function drawDiscussionStage() {
 function drawArtSketchStage() {
   background("#664d35");
   image(sketch, 0, 0, width, height);
-
+  image(tasksIcon, 20, 20,width, height);
   drawBackButton();
 }
 
 //===============================================================================================================================================================
 function drawPosterStage() {
   background(220);
+
+  if (videoStarted) {
+    let sunriseWidth = windowWidth * 0.5;
+    let sunriseHeight = sunrise.height * (sunriseWidth / sunrise.width);
+    image(sunrise, 50, -20, sunriseWidth * 1.2, sunriseHeight * 1.2);  // Display video in top-left corner
+  }
+
   image(poster, 0, 0, width, height);
+
 
   drawBackButton();
 }
