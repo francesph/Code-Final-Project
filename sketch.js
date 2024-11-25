@@ -26,7 +26,7 @@ let replyButton;
 let posterSubmit;
 
 let taskGenerationTimer; // Timer for random task generation
-let maxTasks = 10; // Maximum number of tasks that should be displayed on the screen
+let maxTasks = 12; // Maximum number of tasks that should be displayed on the screen
 let taskContainer;
 let taskListDiv;
 
@@ -39,8 +39,9 @@ let stage = 0;
 // let prevStage = 0;  
 let videoStarted = false;  // Flag to check if the video has started
 
-
-
+let tasksActive = false;
+let isEssayStageEntered = false;
+let isDiscussStageEntered = false;
 //===============================================================================================================================================================
 function preload() {
   // Preload assets
@@ -61,7 +62,7 @@ function preload() {
 
   //buttons
   submitButton = loadImage('assets/submit.png');
-  console.log(submitButton.width, submitButton.height); 
+
   replyButton = loadImage('assets/reply.png');
   posterSubmit = loadImage('assets/poster submit.png');
 }
@@ -91,7 +92,6 @@ function setup() {
   discussInput.elt.style.resize = 'none';
   discussInput.hide();
 
-
   taskContainer = createDiv();
   taskContainer.style('position', 'absolute');
   taskContainer.style('top', '200px');
@@ -108,6 +108,7 @@ function setup() {
   taskListDiv = createDiv();
   taskContainer.child(taskListDiv);
 
+  // Start generating tasks
   startGeneratingTasks();
 }
 //===============================================================================================================================================================
@@ -164,22 +165,18 @@ function windowResized() {
 }
 
 function startGeneratingTasks() {
-  // If task list has space, generate a task
-  if (taskList.length < maxTasks) {
-    generateTask();  // Generate a new task
-  }
-
-  // Set a random interval to generate tasks between 5 and 50 seconds (5000 to 50000 milliseconds)
-  let randomInterval = random(5000, 50000);
+  // Generate tasks continuously every 5 to 7 seconds
+  let randomInterval = random(5000, 7000);
 
   taskGenerationTimer = setTimeout(() => {
-    startGeneratingTasks();  // Keep generating tasks at random intervals
+    generateTask();  // Generate a new task
+    startGeneratingTasks();  // Recursively keep generating tasks
   }, randomInterval);
 }
 
 // Function to generate and add a new task to the task list
 function generateTask() {
-  // If there are already 10 tasks, stop generating more
+  // If there are already 12 tasks, stop generating more
   if (taskList.length >= maxTasks) {
     return;
   }
@@ -193,11 +190,10 @@ function generateTask() {
 
   // Add the task to the list
   taskList.push(newTask);
-  updateTaskListDiv();  // Update the task display immediately after adding a task
+  updateTaskListDiv();  
   console.log("Task generated:", newTask);
 }
-
-// Function to update the task display on the tasks page
+// update the task display
 function updateTaskListDiv() {
   taskListDiv.html(''); // Clear the existing list before re-adding tasks
   
@@ -213,7 +209,7 @@ function updateTaskListDiv() {
   }
 }
 
-// Optional: Add a way to remove tasks from the list manually (e.g., on click or timeout)
+
 function removeTask(index) {
   taskList.splice(index, 1);
 }
@@ -235,21 +231,20 @@ function drawStartPage() { //stage 0
   text("Start", windowWidth / 2, windowHeight / 2);
 
   if (buttonHovered && mouseIsPressed) {
-    prevStage = stage;  // Store the current stage before changing
-    stage = 1;  // Move to message stage
+    stage = 1;
   }
 }
 
 //===============================================================================================================================================================
-function drawMessageStage() { //stage 1
+function drawMessageStage() { // Stage 1
   image(mainDesk, 0, -42, width, height * 1.08);
   fill(255, 255, 255, 150); 
   noStroke();
   rect(0, 0, windowWidth, windowHeight);  // Semi-transparent overlay
 
   // Center the message box
-  let boxWidth = windowWidth * 0.35;  // Set the width of the box (40% of the window width)
-  let boxHeight = windowHeight * 0.25;  // Set the height of the box (25% of the window height)
+  let boxWidth = windowWidth * 0.5;  // Set the width of the box (40% of the window width)
+  let boxHeight = windowHeight * 0.5;  // Set the height of the box (25% of the window height)
   let boxX = (windowWidth - boxWidth) / 2;  // Center the box horizontally
   let boxY = (windowHeight - boxHeight) / 2;  // Center the box vertically 
   // Draw the message box 
@@ -259,28 +254,31 @@ function drawMessageStage() { //stage 1
   // Display the text inside the message box
   fill(255);  // Text color (white)
   textAlign(CENTER, CENTER);  // Align text to center both horizontally and vertically
-  textSize(windowWidth * 0.03);
+  textSize(windowWidth * 0.05);
   
-  let line1 = "I dont have much homework,";
-  let line2 = "but I should try to get ahead";
-  let line3 = "so Im not so swamped later.";
-  let lineSpacing = 48;
+  let line1 = "I dont have much ";
+  let line2 = "homework, but I should ";
+  let line3 = "try to get ahead so Im";
+  let line4 = "not too swamped later.";
+  let line5 = "Its just a few assignments."
+  let lineSpacing = 62;
 
-  // Calculate the total height of the text block to center it
-  let totalTextHeight = (lineSpacing * 2) + 10 + (lineSpacing * 1); // Total height of 3 lines of text
+  let totalTextHeight = (lineSpacing * 4) + 10 + (lineSpacing * 1);
 
-  // Adjust Y position so that the text is centered vertically in the box
-  let textStartY = boxY + (boxHeight - totalTextHeight) / 2; // Center the text vertically in the box
+  let textStartY = boxY + (boxHeight - totalTextHeight)/2; // Center vert in box
 
-  // Draw the text with vertical spacing
-  text(line1, boxX + boxWidth / 2, textStartY);  // Center horizontally, and start vertically
+  text(line1, boxX + boxWidth / 2, textStartY); 
   text(line2, boxX + boxWidth / 2, textStartY + lineSpacing);
   text(line3, boxX + boxWidth / 2, textStartY + (lineSpacing * 2));
+  text(line4, boxX + boxWidth / 2, textStartY + (lineSpacing * 3));
+  text(line5, boxX + boxWidth / 2, textStartY + (lineSpacing * 4));
 
-  let buttonWidth = 150;  // Width
-  let buttonHeight = 50;  // Height
+  let buttonWidth = 150; 
+  let buttonHeight = 50; 
+  // let buttonX = 868;
+  // let buttonY = 467;
   let buttonX = (windowWidth - buttonWidth) / 2;  // Center horizontally
-  let buttonY = boxY + boxHeight - 60;  // Position button below the message box (with padding)
+  let buttonY = boxY + boxHeight - 65;  // Position button below the message box (with padding)
 
   // View Tasks Button hover area
   let viewTasksButtonHovered = mouseX >= buttonX && mouseX <= buttonX + buttonWidth &&
@@ -289,7 +287,7 @@ function drawMessageStage() { //stage 1
   fill(viewTasksButtonHovered ? "#F2A6C8" : "pink");
   rect(buttonX, buttonY, buttonWidth, buttonHeight);
   fill("black");
-  textSize(26);
+  textSize(29);
   textAlign(CENTER, CENTER);
   text("View Tasks", buttonX + buttonWidth / 2, buttonY + buttonHeight / 2);  // Center the text
 
@@ -297,6 +295,7 @@ function drawMessageStage() { //stage 1
   if (viewTasksButtonHovered && mouseIsPressed) {
     prevStage = stage;
     stage = 3;  // Move to tasks stage
+    tasksActive = true;  // Enable task interaction after clicking "View Tasks"
   }
 }
 
@@ -309,10 +308,12 @@ function drawMainDeskStage() { //stage 2
 }
 
 //===============================================================================================================================================================
-function drawTasksStage() { 
-  // stage 3
-  background(200); // Clear the background
+function drawTasksStage() {  // Stage 3
+  if (!tasksActive) return;  // Do nothing if tasks are not active
   
+  // Clear the background and display tasks
+  background(200); 
+
   if (videoStarted) {
     let sunriseWidth = windowWidth * 0.5;
     let sunriseHeight = sunrise.height * (sunriseWidth / sunrise.width);
@@ -335,11 +336,6 @@ function drawTasksStage() {
   let taskContainerWidth = windowWidth / 2;
   let taskContainerHeight = windowHeight * 0.4;
 
-  // Semi-transparent background for the task list container
-  fill(255, 255, 0, 180);
-  noStroke();
-  rect(taskContainerX, taskContainerY, 300, 415);
-
   // Starting position for tasks
   let taskY = taskContainerY + 10;
   let lineSpacing = 34;
@@ -348,9 +344,11 @@ function drawTasksStage() {
   fill("black");
   textSize(26);
 
-  // Loop through the taskList array and display tasks
-  for (let i = 0; i < taskList.length; i++) {
-    let task = taskList[i];
+  // Loop through the taskList array but only show the first 4 tasks
+  let tasksToDisplay = taskList.slice(0, 4);  // Slice the first 4 tasks from taskList
+
+  for (let i = 0; i < tasksToDisplay.length; i++) {
+    let task = tasksToDisplay[i];
 
     let buttonWidth = 300;  // Width of the task item button
     let buttonX = taskContainerX + 10;  // Padding from the left
@@ -370,42 +368,86 @@ function drawTasksStage() {
     if (isHovered && mouseIsPressed) {
       currentTask = task.task;  // Set the current task to the clicked task
       stage = task.stage;  // Navigate to the corresponding task stage
-      taskList.splice(i, 1); // Remove the clicked task from the task list immediately
+      taskList.splice(taskList.indexOf(task), 1); // Remove the clicked task from the main task list immediately
     }
   }
 }
 
 //===============================================================================================================================================================
-function drawEssayStage() {
-  background(255);
+function drawEssayStage() {  // Stage 4
+  if (stage === 4) {
+    background(255);
 
-  if (videoStarted) {
-    let sunriseWidth = windowWidth * 0.5;
-    let sunriseHeight = sunrise.height * (sunriseWidth / sunrise.width);
-    image(sunrise, -450, -20, sunriseWidth * 1.2, sunriseHeight * 1.2);  // Display video in top-left corner
+    // Display video if it's started
+    if (videoStarted) {
+      let sunriseWidth = windowWidth * 0.5;
+      let sunriseHeight = sunrise.height * (sunriseWidth / sunrise.width);
+      image(sunrise, -450, -20, sunriseWidth * 1.2, sunriseHeight * 1.2);  // Display video in top-left corner
+    }
+
+    // Ensure the input field is created only once
+    if (!essayInput) {
+      essayInput = createElement('textarea', '');
+      essayInput.position(608.5, 240);
+      essayInput.size(525, 350);
+      essayInput.attribute('placeholder', 'Type here...');
+      essayInput.elt.style.textAlign = 'left';
+      essayInput.elt.style.padding = '10px';
+      essayInput.elt.style.resize = 'none';
+    }
+
+    // Clear the text input only when first entering the essay stage
+    if (!isEssayStageEntered) {
+      essayInput.value('');  // Reset the content to empty string
+      isEssayStageEntered = true;  // Set the flag to true so it doesn't clear again
+    }
+
+    image(essay, 0, 0, width, height);  // Background image for essay page
+
+    essayInput.show();  // Show the input field
+
+    // Submit button
+    fill("#e6aa90");
+    rect(1198,169.5,79.5,20.5,3);
+    textFont(bandiFont);
+    textSize(15.5);
+    fill(0);
+    text('Submit', 1215.7, 171.5);
+
+    let buttonX = 1198;
+    let buttonY = 169.5;
+    let buttonWidth = 79.5;
+    let buttonHeight = 20.5;
+
+    let buttonHovered = mouseX >= buttonX && mouseX <= buttonX + buttonWidth &&
+                        mouseY >= buttonY && mouseY <= buttonY + buttonHeight;
+
+    // Provide hover feedback (optional)
+    if (buttonHovered) {
+      cursor(HAND);  // Change cursor to a hand when hovering over the button
+      fill("#f2c6b3");  // Change color when hovered
+      rect(buttonX, buttonY, buttonWidth, buttonHeight, 3);  // Re-draw the button with hover color
+      fill(0);
+      text('Submit', 1215.7, 171.5);  // Redraw the text on the button
+    } else {
+      cursor(ARROW);  // Default arrow cursor
+    }
+
+    // Detect button click
+    if (buttonHovered && mouseIsPressed) {
+      submitEssay();  // Trigger the submit action when clicked
+    }
   }
+}
 
-  // Ensure the input field is created only once
-  if (!essayInput) {
-    essayInput = createElement('textarea', '');
-    essayInput.position(608.5, 240);
-    essayInput.size(525, 350);
-    essayInput.attribute('placeholder', 'Type your essay here...');
-    essayInput.elt.style.textAlign = 'left';
-    essayInput.elt.style.padding = '10px';
-    essayInput.elt.style.resize = 'none';
+// Example function to submit the essay
+function submitEssay() {
+  // Hide the input field and submit button when submitting the essay
+  if (essayInput) {
+    essayInput.hide();  // Hide the textarea input when leaving the essay stage
   }
-
-  image(essay, 0, 0, width, height);
-  
-  essayInput.show();  // Show the input field
-
-  fill("#e6aa90");
-  rect(1198,169.5,79.5,20.5,3);
-  textFont(bandiFont);
-  textSize(15.5);
-  fill(0);
-  text('Submit', 1215.7,171.5);
+  stage = 3;  // Switch to tasks page
+  isEssayStageEntered = false;
 }
 
 //===============================================================================================================================================================
@@ -427,6 +469,10 @@ function drawDiscussionStage() {
     discussInput.elt.style.resize = 'none';
     discussInput.hide();
   }
+  if (!isDiscussStageEntered) {
+    discussInput.value('');  // Reset the content to empty string
+    isDiscussStageEntered = true;  // Set the flag to true so it doesn't clear again
+  }
 
   image(discuss, 0, 0, width, height);
 
@@ -444,6 +490,39 @@ function drawDiscussionStage() {
   textSize(23);
   fill(0);
   text('Reply', 1033,605);
+
+  let buttonX = 999;
+  let buttonY = 600;
+  let buttonWidth = 121;
+  let buttonHeight = 35.5;
+
+  let buttonHovered = mouseX >= buttonX && mouseX <= buttonX + buttonWidth &&
+                      mouseY >= buttonY && mouseY <= buttonY + buttonHeight;
+
+  // Provide hover feedback (optional)
+  if (buttonHovered) {
+    cursor(HAND);  // Change cursor to a hand when hovering over the button
+    fill("#f2c6b3");  // Change color when hovered
+    rect(buttonX, buttonY, buttonWidth, buttonHeight, 3);  // Re-draw the button with hover color
+    fill(0);
+    text('Reply', 1033, 605);  // Redraw the text on the button
+  } else {
+    cursor(ARROW);  // Default arrow cursor
+  }
+
+  // Detect button click
+  if (buttonHovered && mouseIsPressed) {
+    submitDiscuss();  // Trigger the submit action when clicked
+  }
+}
+
+// Example function to submit the essay
+function submitDiscuss() {
+  if (discussInput) {
+    discussInput.hide();  // Hide the textarea input when leaving the essay stage
+  }
+  stage = 3;
+  isDiscussStageEntered = false;
 }
 
 //===============================================================================================================================================================
