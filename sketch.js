@@ -5,36 +5,38 @@ let discuss;
 let poster;
 let sketch;
 let tasks;
-let taskList = [
+let taskList = []; // Start with an empty task list
+let taskPool = [
   { task: "500-word Essay", stage: 4 },
-  { task: "Poster", stage: 7},
-  { task: "portrait", stage: 6},
-  { task: "Discussion Board", stage: 5},
-  { task: "reading response", stage: 4},
-
-  { task: "abstract", stage: 4},
-  { task: "reflection", stage: 5},
-
-  { task: "paper 2 draft", stage: 4},
-  { task: "contour drawing", stage: 6},
-  { task: "sketch", stage: 6},
-  { task: "art draft", stage: 6},
-  { task: "one-pager", stage: 7},
-  { task: "graphic", stage: 7},
-
+  { task: "Poster", stage: 7 },
+  { task: "portrait", stage: 6 },
+  { task: "Discussion Board", stage: 5 },
+  { task: "reading response", stage: 4 },
+  { task: "abstract", stage: 4 },
+  { task: "reflection", stage: 5 },
+  { task: "paper 2 draft", stage: 4 },
+  { task: "contour drawing", stage: 6 },
+  { task: "sketch", stage: 6 },
+  { task: "art draft", stage: 6 },
+  { task: "one-pager", stage: 7 },
+  { task: "graphic", stage: 7 }
 ];
 
-let pencil;
+let taskGenerationTimer; // Timer for random task generation
+let maxTasks = 12;
+let taskContainer;
+let taskListDiv;
 
+let pencil;
+let sketchLayer;
+let drawingAreaX = 290;  
+let drawingAreaY = 125;
+let drawingAreaWidth = 880; 
+let drawingAreaHeight = 587;
 
 let submitButton;
 let replyButton;
 let posterSubmit;
-
-let taskGenerationTimer; // Timer for random task generation
-let maxTasks = 12; // Maximum number of tasks that should be displayed on the screen
-let taskContainer;
-let taskListDiv;
 
 let tasksIcon;
 let myFont;
@@ -42,7 +44,6 @@ let clockFont;
 let bandiFont;
 
 let stage = 0;
-// let prevStage = 0;  
 let videoStarted = false;  // Flag to check if the video has started
 
 let tasksActive = false;
@@ -53,11 +54,11 @@ let isPosterStageEntered = false;
 
 let startTime;  // To store the starting time
 let elapsedTime;
-let startHour = 12;  // Start at 12:00 PM
+let startHour = 13;  // Start at 12:00 PM
 let startMinute = 0;
-//===============================================================================================================================================================
+
+// Preload assets
 function preload() {
-  // Preload assets
   sunrise = createVideo(['assets/newsunrise.mp4']);
   sunrise.hide();  // Hide video from HTML page
 
@@ -69,43 +70,24 @@ function preload() {
   sketch = loadImage('assets/sketch.png');
   tasksIcon = loadImage('assets/tasks button.png');
 
-  myFont= loadFont('assets/FsHandwriting-Regular.ttf');
+  myFont = loadFont('assets/FsHandwriting-Regular.ttf');
   clockFont = loadFont('assets/DS-DIGII.TTF');
   bandiFont = loadFont('assets/Core Bandi Face.ttf');
 
-  //buttons
+  // Buttons
   submitButton = loadImage('assets/submit.png');
-
   replyButton = loadImage('assets/reply.png');
   posterSubmit = loadImage('assets/poster submit.png');
-
-  pencil = loadImage('assets/pencil.png')
+  pencil = loadImage('assets/pencil.png');
 }
-//===============================================================================================================================================================
+
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
   textFont(myFont);
 
   sunrise.loop();  // Ensure the video will loop
   sunrise.volume(0);  // Optional: mute the video
-
-  essayInput = createElement('textarea', '');
-  essayInput.position(608.5, 240);
-  essayInput.size(525, 350);
-  essayInput.attribute('placeholder', 'Type your essay here...');
-  essayInput.elt.style.textAlign = 'left';  // Align text to the left (using raw DOM style)
-  essayInput.elt.style.padding = '10px';    // Add padding for better appearance
-  essayInput.elt.style.resize = 'none';
-  essayInput.hide(); // Initially hidden, only shown in the essay stage
-
-  discussInput = createElement('textarea', '');
-  discussInput.position(527, 358);
-  discussInput.size(555, 182);
-  discussInput.attribute('placeholder', 'Type your response here...');
-  discussInput.elt.style.textAlign = 'left'; // Align text to the left
-  discussInput.elt.style.padding = '10px';  // Add padding for better appearance
-  discussInput.elt.style.resize = 'none';
-  discussInput.hide();
 
   taskContainer = createDiv();
   taskContainer.style('position', 'absolute');
@@ -114,7 +96,9 @@ function setup() {
   taskContainer.style('width', '80%');
   taskContainer.style('height', '400px');
   taskContainer.style('overflow-y', 'scroll');  // Enable vertical scrolling
-  taskContainer.style('background-color', 'rgba(255, 255, 255, 0.8)');
+  taskContainer.style('background-color', 'rgba(200, 200, 200, 0.7)');  // White with 80% opacity
+  taskContainer.style('border', '2px solid rgba(0, 0, 0, 0.3)'); // Adds a semi-transparent border
+taskContainer.style('box-shadow', '0px 4px 10px rgba(0, 0, 0, 0.2)');
   taskContainer.style('border-radius', '10px');
   taskContainer.style('padding', '10px');
   taskContainer.hide(); // Hide it initially, show it only on tasks page
@@ -128,74 +112,59 @@ function setup() {
 
   startTime = millis();
   
+  sketchLayer = createGraphics(width, height);
 }
-//===============================================================================================================================================================
 function draw() {
   // Display the video on all stages if it's started
   if (videoStarted) {
     let sunriseWidth = windowWidth * 0.5;
     let sunriseHeight = sunrise.height * (sunriseWidth / sunrise.width);
-    image(sunrise, -70, -20, sunriseWidth*1.2, sunriseHeight*1.2);  // Display video in top-left corner
+    image(sunrise, -70, -20, sunriseWidth * 1.2, sunriseHeight * 1.2);  // Display video in top-left corner
   }
 
   switch(stage) {
     case 0: // Start page
       drawStartPage();
       break;
-
     case 1: // Message stage
       drawMessageStage();
       break;
-
     case 2: // Main desk stage
       drawMainDeskStage();
       break;
-
     case 3: // Tasks stage
       drawTasksStage();
       break;
-
     case 4: // Essay stage
       drawEssayStage();
       clock();
       break;
-
     case 5: // Discussion Board stage
       drawDiscussionStage();
       clock();
       break;
-
     case 6: // Art Sketch stage
       drawArtSketchStage();
       break;
-
     case 7: // Poster stage
       drawPosterStage();
       clock();
       break;
-  }
 
   if (stage === 3) {
     drawTasksStage();
   }
 }
-
+}
 function clock() {
   fill("white");  // Text color
   textFont(clockFont);  // Use the clock font
   textAlign(CENTER, CENTER);  // Center-align the text
   textSize(80);  // Text size
 
-  // Calculate how much time has passed since the program started
   elapsedTime = millis() - startTime;  // Time in milliseconds
-
-  // Calculate the speed-up factor (24 hours in 23 seconds)
   let speedUpFactor = 3760;  // 24 hours / 23 seconds = 3760 seconds per second
-  
-  // Convert the elapsed time to "virtual" seconds
   let virtualSeconds = (elapsedTime / 1000) * speedUpFactor;
-
-  // Calculate the virtual time based on the start time (e.g., 12:00 PM)
   let totalSeconds = virtualSeconds + (startHour * 3600 + startMinute * 60);  // Add the start time offset
   totalSeconds = totalSeconds % 86400;  // Ensure it loops after 24 hours
 
@@ -203,13 +172,9 @@ function clock() {
   let min = floor((totalSeconds % 3600) / 60);  // Get the minute
 
   let noon = Hour >= 12 ? " PM" : " AM";
-  
-  // Ensure minutes are always two digits
   if (min < 10) {
     min = "0" + min;
   }
-
-  // Convert to 12-hour format
   if (Hour === 0) {
     Hour = 12;  // Midnight (00:xx) is 12 AM
   } else if (Hour > 12) {
@@ -218,25 +183,17 @@ function clock() {
 
   let clockX = 200;         // X position of the clock
   let clockY = 620;         // Y position of the clock
-
   push();  // Save the current drawing state
-
-  // Set a rotation angle (rotate the text slightly)
   let rotationAngle = radians(-11);  // Negative for counterclockwise rotation
   translate(clockX, clockY);  // Move the origin to the clock position
   rotate(rotationAngle);  // Apply rotation
 
-  // Draw the clock text at the center
   text(Hour + ":" + min + noon, 0, 0);  // Centered after rotation
-
   pop();  // Restore the original coordinate system
 }
-
-//===============================================================================================================================================================
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);  // Resize canvas when window is resized
 }
-
 function startGeneratingTasks() {
   // Generate tasks continuously every 5 to 7 seconds
   let randomInterval = random(5000, 7000);
@@ -246,27 +203,28 @@ function startGeneratingTasks() {
     startGeneratingTasks();  // Recursively keep generating tasks
   }, randomInterval);
 }
-
-// Function to generate and add a new task to the task list
 function generateTask() {
   // If there are already 12 tasks, stop generating more
   if (taskList.length >= maxTasks) {
-    return;
+    return; // Don't generate more tasks
   }
 
-  // Randomly create a new task
-  let newTask = { 
-    task: "New Task " + (taskList.length + 1), 
-    stage: random(4, 7), 
-    createdAt: millis() // Time when the task was created
-  };
+  // Check if there are tasks left in the pool
+  if (taskPool.length === 0) {
+    console.log("No more tasks available.");
+    return; // Stop generating tasks if no tasks are left in the pool
+  }
 
-  // Add the task to the list
+  // Randomly pick a task from the taskPool
+  let randomIndex = floor(random(taskPool.length));
+  let newTask = taskPool.splice(randomIndex, 1)[0]; // Remove and get the selected task
+
+  // Add the new task to the taskList
   taskList.push(newTask);
+
   updateTaskListDiv();  
   console.log("Task generated:", newTask);
 }
-// update the task display
 function updateTaskListDiv() {
   taskListDiv.html(''); // Clear the existing list before re-adding tasks
   
@@ -281,8 +239,6 @@ function updateTaskListDiv() {
     taskListDiv.child(taskDiv);
   }
 }
-
-
 function removeTask(index) {
   taskList.splice(index, 1);
 }
@@ -307,7 +263,6 @@ function drawStartPage() { //stage 0
     stage = 1;
   }
 }
-
 //===============================================================================================================================================================
 function drawMessageStage() { // Stage 1
   image(mainDesk, 0, -42, width, height * 1.08);
@@ -371,7 +326,6 @@ function drawMessageStage() { // Stage 1
     tasksActive = true;  // Enable task interaction after clicking "View Tasks"
   }
 }
-
 //===============================================================================================================================================================
 function drawMainDeskStage() { //stage 2
   
@@ -379,7 +333,6 @@ function drawMainDeskStage() { //stage 2
   fill(0);
   text("x:" + mouseX + " y:" + mouseY, 100, 100);
 }
-
 //===============================================================================================================================================================
 function drawTasksStage() {  // Stage 3
   if (!tasksActive) return;  // Do nothing if tasks are not active
@@ -418,11 +371,9 @@ function drawTasksStage() {  // Stage 3
   fill("black");
   textSize(26);
 
-  // Loop through the taskList array but only show the first 4 tasks
-  let tasksToDisplay = taskList.slice(0, 4);  // Slice the first 4 tasks from taskList
-
-  for (let i = 0; i < tasksToDisplay.length; i++) {
-    let task = tasksToDisplay[i];
+  // Loop through the taskList and display the tasks
+  for (let i = 0; i < taskList.length; i++) {
+    let task = taskList[i];
 
     let buttonWidth = 300;  // Width of the task item button
     let buttonX = taskContainerX + 10;  // Padding from the left
@@ -438,15 +389,18 @@ function drawTasksStage() {  // Stage 3
     // Display task name
     text(task.task, buttonX + 10, buttonY + 10);
 
-    // Handle task click (navigate to its corresponding stage)
     if (isHovered && mouseIsPressed) {
       currentTask = task.task;  // Set the current task to the clicked task
       stage = task.stage;  // Navigate to the corresponding task stage
-      taskList.splice(taskList.indexOf(task), 1); // Remove the clicked task from the main task list immediately
+    
+      // Optionally: Remove the clicked task from the task list immediately
+      taskList.splice(i, 1); 
+    
+      // Optionally log the task navigation for debugging purposes
+      console.log("Navigating to stage:", stage);
     }
   }
 }
-
 //===============================================================================================================================================================
 function drawEssayStage() {  // Stage 4
   if (stage === 4) {
@@ -599,8 +553,18 @@ function submitDiscuss() {
 //===============================================================================================================================================================
 function drawArtSketchStage() {
   background("#664d35");
+  
+  // Draw the sketch background
   image(sketch, 0, 0, width, height);
 
+  // Draw the user's sketch (from the sketchLayer)
+  image(sketchLayer, 0, 0);
+
+  // Draw a border around the drawing area for visualization (optional)
+  fill(255, 255, 255, 0);  // Red with some transparency for the border
+  noStroke();
+  rect(drawingAreaX, drawingAreaY, drawingAreaWidth, drawingAreaHeight);  // Draw the restricted drawing area
+  
   // Button styling
   fill("#e6aa90");
   rect(1100, 689.5, 83.5, 24.5, 4);  // Draw the button
@@ -634,18 +598,28 @@ function drawArtSketchStage() {
   if (buttonHovered && mouseIsPressed) {
     submitArtSketch();  // Trigger the submit action when clicked
   }
-}
 
-// Function that is triggered when the "Submit" button is clicked
+  // Draw with mouse inside the defined area
+  if (mouseIsPressed && mouseX >= drawingAreaX && mouseX <= drawingAreaX + drawingAreaWidth &&
+      mouseY >= drawingAreaY && mouseY <= drawingAreaY + drawingAreaHeight) {
+    drawOnCanvas(mouseX, mouseY);
+  }
+}
+function drawOnCanvas(x, y) {
+  sketchLayer.stroke(0);  // Set stroke color (black)
+  sketchLayer.strokeWeight(4);  // Set stroke weight (thickness of the line)
+  sketchLayer.line(pmouseX, pmouseY, x, y);  // Draw a line from previous mouse position to current
+}
 function submitArtSketch() {
+  // Clear the sketch layer to reset the drawing
+  sketchLayer.clear();  // This removes everything from the sketchLayer
+
   // Set the stage to 3 to switch to the tasks page
   stage = 3;  // Change to tasks stage
 
   // Optionally reset flags or perform any cleanup (if needed)
   isArtSketchStageEntered = false;  // Reset the flag (if relevant)
 }
-
-
 //===============================================================================================================================================================
 function drawPosterStage() {
   background(220);
