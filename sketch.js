@@ -7,19 +7,25 @@ let sketch;
 let tasks;
 let taskList = [
   { task: "500-word Essay", stage: 4 },
-  { task: "paper 2 draft", stage: 4},
+  { task: "Poster", stage: 7},
+  { task: "portrait", stage: 6},
+  { task: "Discussion Board", stage: 5},
   { task: "reading response", stage: 4},
+
   { task: "abstract", stage: 4},
   { task: "reflection", stage: 5},
-  { task: "Discussion Board", stage: 5},
-  // { task: "portrait", stage: 6},
-  // { task: "contour drawing", stage: 6},
-  // { task: "sketch", stage: 6},
-  // { task: "art draft", stage: 6},
-  // { task: "one-pager", stage: 7},
-  // { task: "graphic", stage: 7},
-  // { task: "Poster", stage: 7},
+
+  { task: "paper 2 draft", stage: 4},
+  { task: "contour drawing", stage: 6},
+  { task: "sketch", stage: 6},
+  { task: "art draft", stage: 6},
+  { task: "one-pager", stage: 7},
+  { task: "graphic", stage: 7},
+
 ];
+
+let pencil;
+
 
 let submitButton;
 let replyButton;
@@ -42,10 +48,17 @@ let videoStarted = false;  // Flag to check if the video has started
 let tasksActive = false;
 let isEssayStageEntered = false;
 let isDiscussStageEntered = false;
+let isArtSketchStageEntered = false;
+let isPosterStageEntered = false;
+
+let startTime;  // To store the starting time
+let elapsedTime;
+let startHour = 12;  // Start at 12:00 PM
+let startMinute = 0;
 //===============================================================================================================================================================
 function preload() {
   // Preload assets
-  sunrise = createVideo(['assets/sunrise.mp4']);
+  sunrise = createVideo(['assets/newsunrise.mp4']);
   sunrise.hide();  // Hide video from HTML page
 
   mainDesk = loadImage('assets/desk.png');
@@ -57,7 +70,7 @@ function preload() {
   tasksIcon = loadImage('assets/tasks button.png');
 
   myFont= loadFont('assets/FsHandwriting-Regular.ttf');
-  clockFont = loadFont('assets/DS-DIGI.TTF');
+  clockFont = loadFont('assets/DS-DIGII.TTF');
   bandiFont = loadFont('assets/Core Bandi Face.ttf');
 
   //buttons
@@ -65,6 +78,8 @@ function preload() {
 
   replyButton = loadImage('assets/reply.png');
   posterSubmit = loadImage('assets/poster submit.png');
+
+  pencil = loadImage('assets/pencil.png')
 }
 //===============================================================================================================================================================
 function setup() {
@@ -110,6 +125,9 @@ function setup() {
 
   // Start generating tasks
   startGeneratingTasks();
+
+  startTime = millis();
+  
 }
 //===============================================================================================================================================================
 function draw() {
@@ -139,10 +157,12 @@ function draw() {
 
     case 4: // Essay stage
       drawEssayStage();
+      clock();
       break;
 
     case 5: // Discussion Board stage
       drawDiscussionStage();
+      clock();
       break;
 
     case 6: // Art Sketch stage
@@ -151,12 +171,65 @@ function draw() {
 
     case 7: // Poster stage
       drawPosterStage();
+      clock();
       break;
   }
 
   if (stage === 3) {
     drawTasksStage();
   }
+}
+
+function clock() {
+  fill("white");  // Text color
+  textFont(clockFont);  // Use the clock font
+  textAlign(CENTER, CENTER);  // Center-align the text
+  textSize(80);  // Text size
+
+  // Calculate how much time has passed since the program started
+  elapsedTime = millis() - startTime;  // Time in milliseconds
+
+  // Calculate the speed-up factor (24 hours in 23 seconds)
+  let speedUpFactor = 3760;  // 24 hours / 23 seconds = 3760 seconds per second
+  
+  // Convert the elapsed time to "virtual" seconds
+  let virtualSeconds = (elapsedTime / 1000) * speedUpFactor;
+
+  // Calculate the virtual time based on the start time (e.g., 12:00 PM)
+  let totalSeconds = virtualSeconds + (startHour * 3600 + startMinute * 60);  // Add the start time offset
+  totalSeconds = totalSeconds % 86400;  // Ensure it loops after 24 hours
+
+  let Hour = floor(totalSeconds / 3600);  // Get the hour
+  let min = floor((totalSeconds % 3600) / 60);  // Get the minute
+
+  let noon = Hour >= 12 ? " PM" : " AM";
+  
+  // Ensure minutes are always two digits
+  if (min < 10) {
+    min = "0" + min;
+  }
+
+  // Convert to 12-hour format
+  if (Hour === 0) {
+    Hour = 12;  // Midnight (00:xx) is 12 AM
+  } else if (Hour > 12) {
+    Hour -= 12;  // Convert hours after 12 PM (13-23) to 1-11 PM
+  }
+
+  let clockX = 200;         // X position of the clock
+  let clockY = 620;         // Y position of the clock
+
+  push();  // Save the current drawing state
+
+  // Set a rotation angle (rotate the text slightly)
+  let rotationAngle = radians(-11);  // Negative for counterclockwise rotation
+  translate(clockX, clockY);  // Move the origin to the clock position
+  rotate(rotationAngle);  // Apply rotation
+
+  // Draw the clock text at the center
+  text(Hour + ":" + min + noon, 0, 0);  // Centered after rotation
+
+  pop();  // Restore the original coordinate system
 }
 
 //===============================================================================================================================================================
@@ -340,6 +413,7 @@ function drawTasksStage() {  // Stage 3
   let taskY = taskContainerY + 10;
   let lineSpacing = 34;
 
+  textFont(myFont);
   textAlign(LEFT, TOP);
   fill("black");
   textSize(26);
@@ -385,6 +459,7 @@ function drawEssayStage() {  // Stage 4
       image(sunrise, -450, -20, sunriseWidth * 1.2, sunriseHeight * 1.2);  // Display video in top-left corner
     }
 
+
     // Ensure the input field is created only once
     if (!essayInput) {
       essayInput = createElement('textarea', '');
@@ -403,7 +478,8 @@ function drawEssayStage() {  // Stage 4
     }
 
     image(essay, 0, 0, width, height);  // Background image for essay page
-
+    fill("black");
+    quad(80, 610, 330, 560, 330, 640, 80, 690)
     essayInput.show();  // Show the input field
 
     // Submit button
@@ -412,7 +488,7 @@ function drawEssayStage() {  // Stage 4
     textFont(bandiFont);
     textSize(15.5);
     fill(0);
-    text('Submit', 1215.7, 171.5);
+    text('Submit', 1238, 177.5);
 
     let buttonX = 1198;
     let buttonY = 169.5;
@@ -428,7 +504,7 @@ function drawEssayStage() {  // Stage 4
       fill("#f2c6b3");  // Change color when hovered
       rect(buttonX, buttonY, buttonWidth, buttonHeight, 3);  // Re-draw the button with hover color
       fill(0);
-      text('Submit', 1215.7, 171.5);  // Redraw the text on the button
+      text('Submit', 1238, 177.5);  // Redraw the text on the button
     } else {
       cursor(ARROW);  // Default arrow cursor
     }
@@ -439,8 +515,6 @@ function drawEssayStage() {  // Stage 4
     }
   }
 }
-
-// Example function to submit the essay
 function submitEssay() {
   // Hide the input field and submit button when submitting the essay
   if (essayInput) {
@@ -449,7 +523,6 @@ function submitEssay() {
   stage = 3;  // Switch to tasks page
   isEssayStageEntered = false;
 }
-
 //===============================================================================================================================================================
 function drawDiscussionStage() {
   background(200);
@@ -475,7 +548,8 @@ function drawDiscussionStage() {
   }
 
   image(discuss, 0, 0, width, height);
-
+  fill("black");
+  quad(80, 610, 330, 560, 330, 640, 80, 690)
   // Show the input field for the discussion stage
   discussInput.show();
 
@@ -485,13 +559,13 @@ function drawDiscussionStage() {
   textSize(24);
 
   fill("#e6aa90");
-  rect(999,600,121,35.5,6);
+  rect(1015,600,121,35.5,6);
   textFont(bandiFont);
   textSize(23);
   fill(0);
-  text('Reply', 1033,605);
+  text('Reply', 1049,605);
 
-  let buttonX = 999;
+  let buttonX = 1015;
   let buttonY = 600;
   let buttonWidth = 121;
   let buttonHeight = 35.5;
@@ -503,9 +577,9 @@ function drawDiscussionStage() {
   if (buttonHovered) {
     cursor(HAND);  // Change cursor to a hand when hovering over the button
     fill("#f2c6b3");  // Change color when hovered
-    rect(buttonX, buttonY, buttonWidth, buttonHeight, 3);  // Re-draw the button with hover color
+    rect(buttonX, buttonY, buttonWidth, buttonHeight, 6);  // Re-draw the button with hover color
     fill(0);
-    text('Reply', 1033, 605);  // Redraw the text on the button
+    text('Reply', 1049, 605);  // Redraw the text on the button
   } else {
     cursor(ARROW);  // Default arrow cursor
   }
@@ -515,8 +589,6 @@ function drawDiscussionStage() {
     submitDiscuss();  // Trigger the submit action when clicked
   }
 }
-
-// Example function to submit the essay
 function submitDiscuss() {
   if (discussInput) {
     discussInput.hide();  // Hide the textarea input when leaving the essay stage
@@ -524,19 +596,55 @@ function submitDiscuss() {
   stage = 3;
   isDiscussStageEntered = false;
 }
-
 //===============================================================================================================================================================
 function drawArtSketchStage() {
   background("#664d35");
   image(sketch, 0, 0, width, height);
 
+  // Button styling
   fill("#e6aa90");
-  rect(1198,169.5,79.5,20.5,3);
+  rect(1100, 689.5, 83.5, 24.5, 4);  // Draw the button
   textFont(bandiFont);
   textSize(15.5);
   fill(0);
-  text('Submit', 1215.7,171.5);
+  text('Submit', 1120, 693.5);  // Button text
+
+  // Button position and size
+  let buttonX = 1100;
+  let buttonY = 689.5;
+  let buttonWidth = 83.5;
+  let buttonHeight = 24.5;
+
+  // Check if the mouse is hovering over the button
+  let buttonHovered = mouseX >= buttonX && mouseX <= buttonX + buttonWidth &&
+                      mouseY >= buttonY && mouseY <= buttonY + buttonHeight;
+
+  // Provide hover feedback (optional)
+  if (buttonHovered) {
+    cursor(HAND);  // Change cursor to hand when hovering over the button
+    fill("#f2c6b3");  // Change button color when hovered
+    rect(buttonX, buttonY, buttonWidth, buttonHeight, 4);  // Re-draw the button with hover color
+    fill(0);
+    text('Submit', 1120, 693.5);  // Redraw the text on the button
+  } else {
+    cursor(ARROW);  // Default arrow cursor when not hovering
+  }
+
+  // Detect button click
+  if (buttonHovered && mouseIsPressed) {
+    submitArtSketch();  // Trigger the submit action when clicked
+  }
 }
+
+// Function that is triggered when the "Submit" button is clicked
+function submitArtSketch() {
+  // Set the stage to 3 to switch to the tasks page
+  stage = 3;  // Change to tasks stage
+
+  // Optionally reset flags or perform any cleanup (if needed)
+  isArtSketchStageEntered = false;  // Reset the flag (if relevant)
+}
+
 
 //===============================================================================================================================================================
 function drawPosterStage() {
@@ -545,11 +653,14 @@ function drawPosterStage() {
   if (videoStarted) {
     let sunriseWidth = windowWidth * 0.5;
     let sunriseHeight = sunrise.height * (sunriseWidth / sunrise.width);
-    image(sunrise, 50, -20, sunriseWidth * 1.2, sunriseHeight * 1.2);  // Display video in top-left corner
+    image(sunrise, -450, -20, sunriseWidth * 1.2, sunriseHeight * 1.2);  // Display video in top-left corner
   }
 
   image(poster, 0, 0, width, height);
+  fill("black");
+  quad(80, 610, 330, 560, 330, 640, 80, 690)
 
+  
 }
 //===============================================================================================================================================================
 function drawButton(x, y, w, h, label, callback) {
