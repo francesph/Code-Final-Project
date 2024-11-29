@@ -57,6 +57,43 @@ let elapsedTime;
 let startHour = 13;  // Start at 12:00 PM
 let startMinute = 0;
 
+let ball;
+let beachSign;
+let caste1;
+let castle2;
+let coconut;
+let coral1;
+let coral2;
+let crab;
+let dolphin1;
+let dolphin2;
+let fish1;
+let girl1;
+let girl2;
+let glasses1;
+let glasses2;
+let guy;
+let hat;
+let mermaid1;
+let mermaid2;
+let mermaid3;
+let oceanFloor;
+let sand1;
+let sand2;
+let sandBucket;
+let seagulls;
+let sun;
+let surfboard;
+let tree1;
+let tree2;
+let umbrella1;
+let umbrella2;
+let underwater1;
+let underwater2;
+let water1;
+let water2;
+let water3;
+
 // Preload assets
 function preload() {
   sunrise = createVideo(['assets/newsunrise.mp4']);
@@ -79,6 +116,44 @@ function preload() {
   replyButton = loadImage('assets/reply.png');
   posterSubmit = loadImage('assets/poster submit.png');
   pencil = loadImage('assets/pencil.png');
+
+
+  ball = loadImage('assets/poster stuff/ball.png');
+  beachSign= loadImage('assets/poster stuff/beach sign.png');
+  caste1= loadImage('assets/poster stuff/castle1.png');
+  castle2= loadImage('assets/poster stuff/castle2.png');
+  coconut= loadImage('assets/poster stuff/coconut.png');
+  coral1= loadImage('assets/poster stuff/coral 1.png');
+  coral2= loadImage('assets/poster stuff/coral 2.png');
+  crab= loadImage('assets/poster stuff/crab.png');
+  dolphin1= loadImage('assets/poster stuff/dolphin1.png');
+  dolphin2= loadImage('assets/poster stuff/dolphin2.png');
+  fish1= loadImage('assets/poster stuff/fish 1.png');
+  girl1= loadImage('assets/poster stuff/girl1.png');
+  girl2= loadImage('assets/poster stuff/girl2.png');
+  glasses1= loadImage('assets/poster stuff/glasses1.png');
+  glasses2= loadImage('assets/poster stuff/glasses2.png');
+  guy= loadImage('assets/poster stuff/guy.png');
+  hat= loadImage('assets/poster stuff/hat.png');
+  mermaid1= loadImage('assets/poster stuff/mermaid1.png');
+  mermaid2= loadImage('assets/poster stuff/mermaid2.png');
+  mermaid3= loadImage('assets/poster stuff/mermaid3.png');
+  oceanFloor= loadImage('assets/poster stuff/ocean floor.png');
+  sand1= loadImage('assets/poster stuff/sand1.png');
+  sand2= loadImage('assets/poster stuff/sand2.png');
+  sandBucket= loadImage('assets/poster stuff/sandbucket.png');
+  seagulls= loadImage('assets/poster stuff/seagulls.png');
+  sun= loadImage('assets/poster stuff/sun.png');
+  surfboard= loadImage('assets/poster stuff/surfboard.png');
+  tree1= loadImage('assets/poster stuff/tree1.png');
+  tree2= loadImage('assets/poster stuff/tree2.png');
+  umbrella1= loadImage('assets/poster stuff/umbrella1.png');
+  umbrella2= loadImage('assets/poster stuff/umbrella2.png');
+  underwater1= loadImage('assets/poster stuff/underwater 1.png');
+  underwater2= loadImage('assets/poster stuff/underwater 2.png');
+  water1= loadImage('assets/poster stuff/water1.png');
+  water2= loadImage('assets/poster stuff/water2.png');
+  water3= loadImage('assets/poster stuff/water3.png');
 }
 
 
@@ -89,6 +164,26 @@ function setup() {
   sunrise.loop();  // Ensure the video will loop
   sunrise.volume(0);  // Optional: mute the video
 
+  essayInput = createElement('textarea', '');
+  essayInput.position(608.5, 240);
+  essayInput.size(525, 350);
+  essayInput.attribute('placeholder', 'Type your essay here...');
+  essayInput.elt.style.textAlign = 'left';  // Align text to the left (using raw DOM style)
+  essayInput.elt.style.padding = '10px';    // Add padding for better appearance
+  essayInput.elt.style.resize = 'none';
+  essayInput.elt.style.border = 'none';
+  essayInput.hide(); // Initially hidden, only shown in the essay stage
+
+  discussInput = createElement('textarea', '');
+  discussInput.position(543, 358);
+  discussInput.size(555, 182);
+  discussInput.attribute('placeholder', 'Type your response here...');
+  discussInput.elt.style.textAlign = 'left'; // Align text to the left
+  discussInput.elt.style.padding = '10px';  // Add padding for better appearance
+  discussInput.elt.style.resize = 'none';
+  discussInput.elt.style.border = 'none';
+  discussInput.hide();
+
   taskContainer = createDiv();
   taskContainer.style('position', 'absolute');
   taskContainer.style('top', '200px');
@@ -96,9 +191,7 @@ function setup() {
   taskContainer.style('width', '80%');
   taskContainer.style('height', '400px');
   taskContainer.style('overflow-y', 'scroll');  // Enable vertical scrolling
-  taskContainer.style('background-color', 'rgba(200, 200, 200, 0.7)');  // White with 80% opacity
-  taskContainer.style('border', '2px solid rgba(0, 0, 0, 0.3)'); // Adds a semi-transparent border
-taskContainer.style('box-shadow', '0px 4px 10px rgba(0, 0, 0, 0.2)');
+  taskContainer.style('background-color', 'rgba(255, 255, 255, 0.8)');
   taskContainer.style('border-radius', '10px');
   taskContainer.style('padding', '10px');
   taskContainer.hide(); // Hide it initially, show it only on tasks page
@@ -111,6 +204,7 @@ taskContainer.style('box-shadow', '0px 4px 10px rgba(0, 0, 0, 0.2)');
   startGeneratingTasks();
 
   startTime = millis();
+  
   
   sketchLayer = createGraphics(width, height);
 }
@@ -151,9 +245,9 @@ function draw() {
       clock();
       break;
 
-  if (stage === 3) {
-    drawTasksStage();
-  }
+  // if (stage === 3) {
+  //   drawTasksStage();
+  // }
 }
 }
 function clock() {
@@ -442,7 +536,7 @@ function drawEssayStage() {  // Stage 4
     textFont(bandiFont);
     textSize(15.5);
     fill(0);
-    text('Submit', 1238, 177.5);
+    text('Submit', 1238, 178.5);
 
     let buttonX = 1198;
     let buttonY = 169.5;
@@ -458,7 +552,7 @@ function drawEssayStage() {  // Stage 4
       fill("#f2c6b3");  // Change color when hovered
       rect(buttonX, buttonY, buttonWidth, buttonHeight, 3);  // Re-draw the button with hover color
       fill(0);
-      text('Submit', 1238, 177.5);  // Redraw the text on the button
+      text('Submit', 1238, 178.5);  // Redraw the text on the button
     } else {
       cursor(ARROW);  // Default arrow cursor
     }
@@ -478,7 +572,7 @@ function submitEssay() {
   isEssayStageEntered = false;
 }
 //===============================================================================================================================================================
-function drawDiscussionStage() {
+function drawDiscussionStage() { //stage 5
   background(200);
 
   if (videoStarted) {
@@ -551,7 +645,7 @@ function submitDiscuss() {
   isDiscussStageEntered = false;
 }
 //===============================================================================================================================================================
-function drawArtSketchStage() {
+function drawArtSketchStage() { //stage 6
   background("#664d35");
   
   // Draw the sketch background
@@ -621,7 +715,7 @@ function submitArtSketch() {
   isArtSketchStageEntered = false;  // Reset the flag (if relevant)
 }
 //===============================================================================================================================================================
-function drawPosterStage() {
+function drawPosterStage() { //stage 7
   background(220);
 
   if (videoStarted) {
@@ -634,8 +728,39 @@ function drawPosterStage() {
   fill("black");
   quad(80, 610, 330, 560, 330, 640, 80, 690)
 
+   // Submit button
+   fill("#e6aa90");
+   rect(1271.5,607.5,79.5,20.5,3);
+   textFont(bandiFont);
+   textSize(15.5);
+   fill(0);
+   text('Submit', 1311, 615.5);
+
+   let buttonX = 1271.5;
+   let buttonY = 607.5;
+   let buttonWidth = 79.5;
+   let buttonHeight = 20.5;
+
+   let buttonHovered = mouseX >= buttonX && mouseX <= buttonX + buttonWidth &&
+                       mouseY >= buttonY && mouseY <= buttonY + buttonHeight;
+
+   // Provide hover feedback (optional)
+   if (buttonHovered) {
+     cursor(HAND);  // Change cursor to a hand when hovering over the button
+     fill("#f2c6b3");  // Change color when hovered
+     rect(buttonX, buttonY, buttonWidth, buttonHeight, 3);  // Re-draw the button with hover color
+     fill(0);
+     text('Submit', 1311, 615.5);  // Redraw the text on the button
+   } else {
+     cursor(ARROW);  // Default arrow cursor
+   }
+
+   // Detect button click
+   if (buttonHovered && mouseIsPressed) {
+     submitEssay();  // Trigger the submit action when clicked
+   }
   
-}
+} 
 //===============================================================================================================================================================
 function drawButton(x, y, w, h, label, callback) {
   let buttonHovered = mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h;
