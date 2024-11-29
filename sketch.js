@@ -211,11 +211,12 @@ function setup() {
 
   startGeneratingTasks();
 
-  // startTime = millis();
+  startTime = millis();
   
   
   sketchLayer = createGraphics(width, height);
 }
+
 function draw() {
   // Display the video on all stages if it's started
   if (videoStarted) {
@@ -298,7 +299,7 @@ function windowResized() {
 }
 function startGeneratingTasks() {
   // Generate tasks continuously every 5 to 7 seconds
-  let randomInterval = random(1000, 1000);
+  let randomInterval = random(4000, 10000);
 
   taskGenerationTimer = setTimeout(() => {
     generateTask();  // Generate a new task
