@@ -60,11 +60,6 @@ let elapsedTime;
 let startHour = 12.5;  // Start at 1:00 PM
 let startMinute = 0;
 
-let ball;
-let ballX = 420, ballY = 230;  // Initial position of the ball
-let isDragging = false;  // Track whether the ball is being dragged
-let offsetX, offsetY;
-let scaleFactor = 0.05;
 
 let areaX = 405;
 let areaY = 227;
@@ -72,42 +67,7 @@ let areaWidth = 892;
 let areaHeight = 430;
 
 
-let beachSign;
 
-// let caste1;
-// let castle2;
-// let coconut;
-// let coral1;
-// let coral2;
-// let crab;
-// let dolphin1;
-// let dolphin2;
-// let fish1;
-// let girl1;
-// let girl2;
-// let glasses1;
-// let glasses2;
-// let guy;
-// let hat;
-// let mermaid1;
-// let mermaid2;
-// let mermaid3;
-// let oceanFloor;
-// let sand1;
-// let sand2;
-// let sandBucket;
-// let seagulls;
-// let sun;
-// let surfboard;
-// let tree1;
-// let tree2;
-// let umbrella1;
-// let umbrella2;
-// let underwater1;
-// let underwater2;
-// let water1;
-// let water2;
-// let water3;
 
 // Preload assets
 function preload() {
@@ -130,48 +90,26 @@ function preload() {
   submitButton = loadImage('assets/submit.png');
   replyButton = loadImage('assets/reply.png');
   posterSubmit = loadImage('assets/poster submit.png');
-  pencil = loadImage('assets/pencil.png');
+  pencil = loadImage('assets/pencil.png', function() {
+    // Calculate the aspect ratio
+    let aspectRatio = pencil.width / pencil.height;
 
+    // Desired width (you can change this value to any desired width)
+    let newWidth = 672;
 
-  ball = loadImage('assets/poster stuff/ball.png');
+    // Calculate the new height to maintain the aspect ratio
+    let newHeight = newWidth / aspectRatio;
 
-  
-  // beachSign= loadImage('assets/poster stuff/beach sign.png');
-  // caste1= loadImage('assets/poster stuff/castle1.png');
-  // castle2= loadImage('assets/poster stuff/castle2.png');
-  // coconut= loadImage('assets/poster stuff/coconut.png');
-  // coral1= loadImage('assets/poster stuff/coral 1.png');
-  // coral2= loadImage('assets/poster stuff/coral 2.png');
-  // crab= loadImage('assets/poster stuff/crab.png');
-  // dolphin1= loadImage('assets/poster stuff/dolphin1.png');
-  // dolphin2= loadImage('assets/poster stuff/dolphin2.png');
-  // fish1= loadImage('assets/poster stuff/fish 1.png');
-  // girl1= loadImage('assets/poster stuff/girl1.png');
-  // girl2= loadImage('assets/poster stuff/girl2.png');
-  // glasses1= loadImage('assets/poster stuff/glasses1.png');
-  // glasses2= loadImage('assets/poster stuff/glasses2.png');
-  // guy= loadImage('assets/poster stuff/guy.png');
-  // hat= loadImage('assets/poster stuff/hat.png');
-  // mermaid1= loadImage('assets/poster stuff/mermaid1.png');
-  // mermaid2= loadImage('assets/poster stuff/mermaid2.png');
-  // mermaid3= loadImage('assets/poster stuff/mermaid3.png');
-  // oceanFloor= loadImage('assets/poster stuff/ocean floor.png');
-  // sand1= loadImage('assets/poster stuff/sand1.png');
-  // sand2= loadImage('assets/poster stuff/sand2.png');
-  // sandBucket= loadImage('assets/poster stuff/sandbucket.png');
-  // seagulls= loadImage('assets/poster stuff/seagulls.png');
-  // sun= loadImage('assets/poster stuff/sun.png');
-  // surfboard= loadImage('assets/poster stuff/surfboard.png');
-  // tree1= loadImage('assets/poster stuff/tree1.png');
-  // tree2= loadImage('assets/poster stuff/tree2.png');
-  // umbrella1= loadImage('assets/poster stuff/umbrella1.png');
-  // umbrella2= loadImage('assets/poster stuff/umbrella2.png');
-  // underwater1= loadImage('assets/poster stuff/underwater 1.png');
-  // underwater2= loadImage('assets/poster stuff/underwater 2.png');
-  // water1= loadImage('assets/poster stuff/water1.png');
-  // water2= loadImage('assets/poster stuff/water2.png');
-  // water3= loadImage('assets/poster stuff/water3.png');
+    // Resize the pencil image while maintaining aspect ratio
+    pencil.resize(newWidth, newHeight);
+
+    console.log('Pencil image loaded and resized:', pencil.width, pencil.height);
+  }, function() {
+    console.error('Error loading pencil image');
+  });
 }
+
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
   textFont(myFont);
@@ -362,7 +300,7 @@ function windowResized() {
 }
 function startGeneratingTasks() {
   // Generate tasks continuously every 5 to 7 seconds
-  let randomInterval = random(1000, 10000);
+  let randomInterval = random(1000, 1000);
 
   taskGenerationTimer = setTimeout(() => {
     generateTask();  // Generate a new task
@@ -754,6 +692,7 @@ function drawArtSketchStage() { //stage 6
   // Draw the user's sketch (from the sketchLayer)
   image(sketchLayer, 0, 0);
 
+  image(pencil, mouseX - pencil.width / 3.2, mouseY - pencil.height / 1.099);
   // Draw a border around the drawing area for visualization (optional)
   fill(255, 255, 255, 0);  // Red with some transparency for the border
   noStroke();
@@ -792,7 +731,7 @@ function drawArtSketchStage() { //stage 6
   if (buttonHovered && mouseIsPressed) {
     submitArtSketch();  // Trigger the submit action when clicked
   }
-
+  
   // Draw with mouse inside the defined area
   if (mouseIsPressed && mouseX >= drawingAreaX && mouseX <= drawingAreaX + drawingAreaWidth &&
       mouseY >= drawingAreaY && mouseY <= drawingAreaY + drawingAreaHeight) {
@@ -800,6 +739,7 @@ function drawArtSketchStage() { //stage 6
   }
 }
 function drawOnCanvas(x, y) {
+  
   sketchLayer.stroke(0);  // Set stroke color (black)
   sketchLayer.strokeWeight(4);  // Set stroke weight (thickness of the line)
   sketchLayer.line(pmouseX, pmouseY, x, y);  // Draw a line from previous mouse position to current
@@ -829,7 +769,7 @@ function drawPosterStage() { //stage 7
   quad(80, 610, 330, 560, 330, 640, 80, 690)
 
   drawRestrictedAreaBorder();
-  drawDraggableBall();
+  // drawDraggableBall();
 
 
    // Submit button
@@ -876,62 +816,6 @@ function drawRestrictedAreaBorder() {
   rect(areaX, areaY, areaWidth, areaHeight);
 }
 
-
-
-
-
-function drawDraggableBall() {
-  // Calculate the new width and height based on the scale factor
-  let scaledWidth = ball.width * scaleFactor;
-  let scaledHeight = ball.height * scaleFactor;
-
-  // Draw the draggable ball image at the specified coordinates
-  image(ball, ballX, ballY, scaledWidth, scaledHeight);
-
-  // Check if mouse is pressed and it's over the ball (collision detection)
-  if (isMouseOverBall()) {
-    cursor(HAND);  // Change the cursor to a hand when hovering over the ball
-  } else {
-    cursor(ARROW);  // Default cursor
-  }
-
-  // If mouse is pressed and over the ball, start dragging
-  if (isMouseOverBall() && mouseIsPressed) {
-    if (!isDragging) {
-      // Start dragging, calculate the offset from mouse to ball's position
-      isDragging = true;
-      offsetX = mouseX - ballX;
-      offsetY = mouseY - ballY;
-    }
-  }
-
-  // If the mouse is released, stop dragging
-  if (!mouseIsPressed) {
-    isDragging = false;
-  }
-
-  // While dragging, update the position of the ball
-  if (isDragging) {
-    ballX = mouseX - offsetX;
-    ballY = mouseY - offsetY;
-
-    ballX = constrain(ballX, areaX, areaX + areaWidth - scaledWidth);  // X position constraint
-    ballY = constrain(ballY, areaY, areaY + areaHeight - scaledHeight); 
-  }
-}
-
-// Function to check if the mouse is over the ball (for collision detection)
-function isMouseOverBall() {
-  // Check if the mouse is over the ball (taking into account the scaling)
-  return mouseX > ballX && mouseX < ballX + ball.width * scaleFactor &&
-         mouseY > ballY && mouseY < ballY + ball.height * scaleFactor;
-}
-
-// Optionally, use a function to change the scale dynamically (for resizing)
-function setBallScale(newScale) {
-  scaleFactor = newScale;  // Change the scale of the ball
-}
-
 //===============================================================================================================================================================
 function drawButton(x, y, w, h, label, callback) {
   let buttonHovered = mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h;
@@ -945,6 +829,7 @@ function drawButton(x, y, w, h, label, callback) {
     callback();  // Call the callback function (e.g., change stage)
   }
 }
+
 //===============================================================================================================================================================
 function updateEssayText() {
   // Store the value typed in the essay input field
