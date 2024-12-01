@@ -68,6 +68,8 @@ let areaY = 227;
 let areaWidth = 892;
 let areaHeight = 430;
 
+let lastFlashTime = 0; // Variable to keep track of the last flash time
+let flashInterval = 1000; // Time in milliseconds for each flash (1 second)
 let flashMessages = [
   "Work faster!",
   "Are you lazy? You should be done by now!",
@@ -77,9 +79,8 @@ let flashMessages = [
   "just a few more assignments and then you can enjoy the weekend"
 ];
 let currentFlashMessage = "";  // Store the current flashing message
-let flashTimer = 0;  // Timer to control flashing
-let flashDuration = 60;  // Duration of each flash (in frames)
 let showText = false;
+
 let wordCount=0;
 
 // Preload assets
@@ -238,19 +239,23 @@ function displayWordCount() {
   text("Word Count: " + wordCount, 470, 630);  // Display word count near the top
 }
 function handleFlashingText() {
-  // Increase the flashTimer on each frame
-  flashTimer++;
+  // Get the current time in milliseconds
+  let currentTime = millis();
 
-  if (flashTimer >= flashDuration) {
-    showText = !showText; 
-    flashTimer = 0;  // Reset timer
+  // Check if the flash interval has passed
+  if (currentTime - lastFlashTime >= flashInterval) {
+    // Toggle the visibility of the flashing text
+    showText = !showText;
+
+    // Update the last flash time to the current time
+    lastFlashTime = currentTime;
+
     // Randomly pick a new message from the array
     currentFlashMessage = random(flashMessages);
   }
 
-
+  // Show the flashing text if 'showText' is true
   if (showText) {
-  
     push();  
     
     fill("red");  
@@ -350,8 +355,8 @@ function windowResized() {
   resizeCanvas(windowWidth, windowHeight);  // Resize canvas when window is resized
 }
 function startGeneratingTasks() {
-  // Generate tasks continuously every 5 to 7 seconds
-  let randomInterval = random(1000, 10000);
+
+  let randomInterval = random(1000, 10000); //1-10 seconds
 
   taskGenerationTimer = setTimeout(() => {
     generateTask();  // Generate a new task
@@ -428,6 +433,9 @@ function removeTask(index) {
 //===============================================================================================================================================================
 function drawStartPage() {
   image(start, 0, 0, width, height);
+  fill(0)
+  textSize(12)
+  text("Music: https://www.bensound.com License code: RRF6OPMJLACN0KSW   Lee, Hyum-Seung Hahm, Dae-Hoon Designers", 280,820)
 
   // Define button position and size
   let buttonX = windowWidth / 2 - 75;
