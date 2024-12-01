@@ -847,15 +847,15 @@ function submitArtSketch() {
 }
 //===============================================================================================================================================================
 
-function drawRestrictedAreaBorder() {
-  // Set border color and thickness
-  stroke(0);  // Black border color
-  strokeWeight();  // Border thickness
-  noFill();  // No fill color inside the rectangle
+// function drawRestrictedAreaBorder() {
+//   // Set border color and thickness
+//   stroke(0);  // Black border color
+//   strokeWeight();  // Border thickness
+//   noFill();  // No fill color inside the rectangle
 
-  // Draw the rectangle (border) around the restricted area
-  rect(areaX, areaY, areaWidth, areaHeight);
-}
+//   // Draw the rectangle (border) around the restricted area
+//   rect(areaX, areaY, areaWidth, areaHeight);
+// }
 
 //===============================================================================================================================================================
 function drawButton(x, y, w, h, label, callback) {
