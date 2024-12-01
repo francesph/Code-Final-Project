@@ -1,4 +1,6 @@
 let sunrise;
+let song;
+let start;
 let mainDesk;
 let essay;
 let discuss;
@@ -19,7 +21,7 @@ let taskPool = [
   { task: "sketch", stage: 6 },
   { task: "art draft", stage: 6 },
   { task: "landscape drawing", stage: 6 },
-  { task: "respond to classmate's response", stage: 5 }
+  { task: "respond to classmate", stage: 5 }
 ];
 
 let taskGenerationTimer; // Timer for random task generation
@@ -78,10 +80,12 @@ let currentFlashMessage = "";  // Store the current flashing message
 let flashTimer = 0;  // Timer to control flashing
 let flashDuration = 60;  // Duration of each flash (in frames)
 let showText = false;
-
+let wordCount=0;
 
 // Preload assets
 function preload() {
+  start = loadImage('assets/start page.png');
+  song = loadSound("assets/floatinggarden.mp3");
   sunrise = createVideo(['assets/newsunrise.mp4']);
   sunrise.hide();  // Hide video from HTML page
 
@@ -119,11 +123,10 @@ function preload() {
     console.error('Error loading pencil image');
   });
 }
-
-
 function setup() {
   createCanvas(windowWidth, windowHeight);
   textFont(myFont);
+
 
   sunrise.loop();  // Ensure the video will loop
   sunrise.volume(0);  // Optional: mute the video
@@ -171,6 +174,7 @@ function setup() {
   
   sketchLayer = createGraphics(width, height);
 }
+
 function draw() {
   // Display the video on all stages if it's started
   if (videoStarted) {
@@ -214,46 +218,51 @@ function draw() {
       drawDayCounter();
 
       break;
-    case 7: // Poster stage
-      drawPosterStage();
-      updateDayCounter();
-      drawDayCounter();
-      clock();
-
-      break;
   }
 
+}
+function updateWordCount() {
+  // Get the text from the input field
+  let inputText = essayInput.value();
+  
+  // Split the input text into words based on spaces
+  // Remove leading/trailing spaces and split by one or more spaces
+  let words = inputText.trim().split(/\s+/);
+  
+  // Update the word count (exclude empty strings)
+  wordCount = words.filter(word => word.length > 0).length;
+}
+function displayWordCount() {
+  fill("black");
+  textSize(15);
+  text("Word Count: " + wordCount, 470, 630);  // Display word count near the top
 }
 function handleFlashingText() {
   // Increase the flashTimer on each frame
   flashTimer++;
 
-  // Toggle the visibility of the text every 'flashDuration' frames
   if (flashTimer >= flashDuration) {
-    showText = !showText;  // Toggle visibility
+    showText = !showText; 
     flashTimer = 0;  // Reset timer
     // Randomly pick a new message from the array
     currentFlashMessage = random(flashMessages);
   }
 
-  // Draw the flashing text ONLY when showText is true
+
   if (showText) {
-    // Save current drawing settings before changing
+  
     push();  
     
-    // Set specific styles for flashing text
-    fill("red");  // Black color for the text
-    textSize(32);  // Size for flashing text
-    textAlign(CENTER, TOP);  // Align in the center and top of the screen
+    fill("red");  
+    textSize(32); 
+    textAlign(CENTER, TOP); 
 
     // Draw the flashing text at the center of the screen
     text(currentFlashMessage, width / 2, 30);
-    
-    // Restore the previous drawing settings
+  
     pop();
   }
 }
-
 function clock() {
   fill("white");  // Text color
   textFont(clockFont);
@@ -269,14 +278,13 @@ function clock() {
   // Virtual time in seconds (adjusted by the speed factor)
   let virtualSeconds = (elapsedTime / 1000) * speedUpFactor;
 
-  // Calculate the offset for starting at 1 PM (13:00)
-  let startOffsetInSeconds = startHour * 3600 + startMinute * 60;  // Convert 1 PM to seconds
-  virtualSeconds += startOffsetInSeconds;  // Add the start offset to the virtual time
 
-  // Ensure total virtual time is wrapped around after 24 hours (86400 seconds)
-  let totalVirtualSeconds = virtualSeconds % 86400;  // 86400 seconds in a day
+  let startOffsetInSeconds = startHour * 3600 + startMinute * 60;  
+  virtualSeconds += startOffsetInSeconds;  
 
-  // Calculate hours and minutes in virtual time
+  let totalVirtualSeconds = virtualSeconds % 86400;  
+
+
   let virtualHour = floor(totalVirtualSeconds / 3600);  // Virtual hour
   let virtualMinute = floor((totalVirtualSeconds % 3600) / 60);  // Virtual minute
 
@@ -289,12 +297,11 @@ function clock() {
     virtualMinute = "0" + virtualMinute;
   }
   if (virtualHour === 0) {
-    virtualHour = 12;  // Midnight (00:xx) should be displayed as 12 AM
+    virtualHour = 12; 
   } else if (virtualHour > 12) {
-    virtualHour -= 12;  // Convert hours after 12 PM (13-23) to 1-11 PM
+    virtualHour -= 12;  
   }
 
-  // Draw the virtual clock
   let clockX = 200;
   let clockY = 620;
   push();
@@ -306,12 +313,12 @@ function clock() {
 }
 function updateDayCounter() {
   let elapsedTime = millis() - startTime;
-  let speedUpFactor = 3760;  // Speed up factor for the virtual clock
+  let speedUpFactor = 3760;  
   let virtualSeconds = (elapsedTime / 1000) * speedUpFactor;
   
-  // Calculate the offset for starting at 1 PM (13:00)
+
   let startOffsetInSeconds = startHour * 3600 + startMinute * 60;
-  virtualSeconds += startOffsetInSeconds;  // Add the start offset to the virtual time
+  virtualSeconds += startOffsetInSeconds;  
   
   // Normalize to 24 hours (86400 seconds)
   let totalVirtualSeconds = virtualSeconds % 86400;  
@@ -320,10 +327,10 @@ function updateDayCounter() {
   let virtualHour = floor(totalVirtualSeconds / 3600);
   let virtualMinute = floor((totalVirtualSeconds % 3600) / 60);
 
-  // Debugging log to track virtual time
+
   console.log("Virtual Time: " + virtualHour + ":" + virtualMinute);
 
-  // Check if it's exactly midnight (12:00 AM) in virtual time
+
   if (virtualHour === 0 && virtualMinute === 0 && !lastMidnight) {
     console.log(">>> It's 12:00 AM, Incrementing Day...");
     currentDay++;  // Increment the day counter
@@ -344,7 +351,7 @@ function windowResized() {
 }
 function startGeneratingTasks() {
   // Generate tasks continuously every 5 to 7 seconds
-  let randomInterval = random(1000, 1000);
+  let randomInterval = random(1000, 10000);
 
   taskGenerationTimer = setTimeout(() => {
     generateTask();  // Generate a new task
@@ -419,36 +426,69 @@ function removeTask(index) {
   taskList.splice(index, 1);
 }
 //===============================================================================================================================================================
-function drawStartPage() { //stage 0
-  background("#e8a2b6");
-  textAlign(CENTER, CENTER);
-  fill("black");
-  textSize(50);
-  text("EFFICIENCY", windowWidth / 2, windowHeight / 4);
+function drawStartPage() {
+  image(start, 0, 0, width, height);
 
-  // Start Button
-  let buttonHovered = mouseX >= windowWidth / 2 - 75 && mouseX <= windowWidth / 2 + 75 &&
-                      mouseY >= windowHeight / 2 - 25 && mouseY <= windowHeight / 2 + 25;
-  fill(buttonHovered ? "#A0D8A5" : "#8bbb96");
-  rect(windowWidth / 2 - 75, windowHeight / 2 - 25, 150, 50);
-  textSize(27);
-  fill("black");
-  text("Start", windowWidth / 2, windowHeight / 2);
+  // Define button position and size
+  let buttonX = windowWidth / 2 - 75;
+  let buttonY = windowHeight / 1.6 - 25;
+  let buttonWidth = 150;
+  let buttonHeight = 50;
 
+  // Check if the mouse is over the button
+  let buttonHovered = mouseX >= buttonX && mouseX <= buttonX + buttonWidth &&
+                      mouseY >= buttonY && mouseY <= buttonY + buttonHeight;
+
+  // Set button color based on hover state
+  fill(buttonHovered ? "#c8b699" : "#e1cdb0");
+  rect(buttonX, buttonY, buttonWidth, buttonHeight);  // Draw the rectangle
+
+  // Draw the "Start" text in the center of the button
+  textSize(30);
+  fill("black");
+  textAlign(CENTER, CENTER);  // Center the text both horizontally and vertically
+  text("START", buttonX + buttonWidth / 2, buttonY + buttonHeight / 2);
+
+  // Move to the next stage when the button is clicked
   if (buttonHovered && mouseIsPressed) {
+    console.log("Start button clicked!");  // This will confirm the button is being clicked
     stage = 1;
+    startSound();
   }
 }
+
+function startSound() {
+  // Get the AudioContext and resume it
+  let audioContext = getAudioContext();
+  if (audioContext.state === 'suspended') {
+    audioContext.resume().then(() => {
+      console.log('AudioContext resumed');
+      if (!song.isPlaying()) {
+        song.loop();  // Start the sound and make it loop
+        song.setVolume(1);  // Set volume to full
+        console.log('Song is playing now!');
+      }
+    });
+  } else {
+    // If AudioContext is already running, just play the sound
+    if (!song.isPlaying()) {
+      song.loop();  // Start the sound and make it loop
+      song.setVolume(1);  // Set volume to full
+      console.log('Song is playing now!');
+    }
+  }
+}
+
 //===============================================================================================================================================================
 function drawMessageStage() { // Stage 1
   image(mainDesk, 0, -42, width, height * 1.08);
   fill(255, 255, 255, 150); 
   noStroke();
-  rect(0, 0, windowWidth, windowHeight);  // Semi-transparent overlay
+  rect(0, 0, windowWidth, windowHeight); 
 
   // Center the message box
-  let boxWidth = windowWidth * 0.5;  // Set the width of the box (40% of the window width)
-  let boxHeight = windowHeight * 0.5;  // Set the height of the box (25% of the window height)
+  let boxWidth = windowWidth * 0.5;  
+  let boxHeight = windowHeight * 0.5; 
   let boxX = (windowWidth - boxWidth) / 2;  // Center the box horizontally
   let boxY = (windowHeight - boxHeight) / 2;  // Center the box vertically 
   // Draw the message box 
@@ -575,6 +615,7 @@ function drawTasksStage() {  // Stage 3
       // Optionally log the task navigation for debugging purposes
       console.log("Navigating to stage:", stage);
     }
+    handleFlashingText();
   }
 }
 //===============================================================================================================================================================
@@ -644,6 +685,8 @@ function drawEssayStage() {  // Stage 4
       submitEssay();  // Trigger the submit action when clicked
     }
     handleFlashingText();
+    updateWordCount();
+    displayWordCount();
   }
   
 }
@@ -803,57 +846,7 @@ function submitArtSketch() {
   isArtSketchStageEntered = false;  // Reset the flag (if relevant)
 }
 //===============================================================================================================================================================
-function drawPosterStage() { //stage 7
-  background(220);
 
-  if (videoStarted) {
-    let sunriseWidth = windowWidth * 0.5;
-    let sunriseHeight = sunrise.height * (sunriseWidth / sunrise.width);
-    image(sunrise, -450, -20, sunriseWidth * 1.2, sunriseHeight * 1.2);  // Display video in top-left corner
-  }
-
-  image(poster, 0, 0, width, height);
-  fill("black");
-  quad(80, 610, 330, 560, 330, 640, 80, 690)
-
-  drawRestrictedAreaBorder();
-  // drawDraggableBall();
-
-
-   // Submit button
-   fill("#e6aa90");
-   rect(1271.5,607.5,79.5,20.5,3);
-   textFont(bandiFont);
-   textSize(15.5);
-   fill(0);
-   text('Submit', 1311, 615.5);
-
-   let buttonX = 1271.5;
-   let buttonY = 607.5;
-   let buttonWidth = 79.5;
-   let buttonHeight = 20.5;
-
-   let buttonHovered = mouseX >= buttonX && mouseX <= buttonX + buttonWidth &&
-                       mouseY >= buttonY && mouseY <= buttonY + buttonHeight;
-
-   // Provide hover feedback (optional)
-   if (buttonHovered) {
-     cursor(HAND);  // Change cursor to a hand when hovering over the button
-     fill("#f2c6b3");  // Change color when hovered
-     rect(buttonX, buttonY, buttonWidth, buttonHeight, 3);  // Re-draw the button with hover color
-     fill(0);
-     text('Submit', 1311, 615.5);  // Redraw the text on the button
-   } else {
-     cursor(ARROW);  // Default arrow cursor
-   }
-
-
-   // Detect button click
-   if (buttonHovered && mouseIsPressed) {
-     submitEssay();  // Trigger the submit action when clicked
-   }
-  
-} 
 function drawRestrictedAreaBorder() {
   // Set border color and thickness
   stroke(0);  // Black border color
