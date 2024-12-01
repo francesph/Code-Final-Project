@@ -8,7 +8,7 @@ let tasks;
 let taskList = []; // Start with an empty task list
 let taskPool = [
   { task: "500-word Essay", stage: 4 },
-  { task: "Poster", stage: 7 },
+  { task: "first impressions of reading", stage: 5 },
   { task: "portrait", stage: 6 },
   { task: "Discussion Board", stage: 5 },
   { task: "reading response", stage: 4 },
@@ -18,8 +18,8 @@ let taskPool = [
   { task: "contour drawing", stage: 6 },
   { task: "sketch", stage: 6 },
   { task: "art draft", stage: 6 },
-  { task: "one-pager", stage: 7 },
-  { task: "graphic", stage: 7 }
+  { task: "landscape drawing", stage: 6 },
+  { task: "respond to classmate's response", stage: 5 }
 ];
 
 let taskGenerationTimer; // Timer for random task generation
@@ -66,7 +66,18 @@ let areaY = 227;
 let areaWidth = 892;
 let areaHeight = 430;
 
-
+let flashMessages = [
+  "Work faster!",
+  "Are you lazy? You should be done by now!",
+  "why is it taking you this long??",
+  "FOCUS!! You are so far behind",
+  "these assignments aren't even hard, why is it taking you this long",
+  "just a few more assignments and then you can enjoy the weekend"
+];
+let currentFlashMessage = "";  // Store the current flashing message
+let flashTimer = 0;  // Timer to control flashing
+let flashDuration = 60;  // Duration of each flash (in frames)
+let showText = false;
 
 
 // Preload assets
@@ -189,6 +200,7 @@ function draw() {
       updateDayCounter();
       drawDayCounter();
       clock();
+
       break;
     case 5: // Discussion Board stage
       drawDiscussionStage();
@@ -200,16 +212,48 @@ function draw() {
       drawArtSketchStage();
       updateDayCounter();
       drawDayCounter();
+
       break;
     case 7: // Poster stage
       drawPosterStage();
       updateDayCounter();
       drawDayCounter();
       clock();
+
       break;
+  }
 
 }
+function handleFlashingText() {
+  // Increase the flashTimer on each frame
+  flashTimer++;
+
+  // Toggle the visibility of the text every 'flashDuration' frames
+  if (flashTimer >= flashDuration) {
+    showText = !showText;  // Toggle visibility
+    flashTimer = 0;  // Reset timer
+    // Randomly pick a new message from the array
+    currentFlashMessage = random(flashMessages);
+  }
+
+  // Draw the flashing text ONLY when showText is true
+  if (showText) {
+    // Save current drawing settings before changing
+    push();  
+    
+    // Set specific styles for flashing text
+    fill("red");  // Black color for the text
+    textSize(32);  // Size for flashing text
+    textAlign(CENTER, TOP);  // Align in the center and top of the screen
+
+    // Draw the flashing text at the center of the screen
+    text(currentFlashMessage, width / 2, 30);
+    
+    // Restore the previous drawing settings
+    pop();
+  }
 }
+
 function clock() {
   fill("white");  // Text color
   textFont(clockFont);
@@ -599,7 +643,9 @@ function drawEssayStage() {  // Stage 4
     if (buttonHovered && mouseIsPressed) {
       submitEssay();  // Trigger the submit action when clicked
     }
+    handleFlashingText();
   }
+  
 }
 function submitEssay() {
   // Hide the input field and submit button when submitting the essay
@@ -674,6 +720,7 @@ function drawDiscussionStage() { //stage 5
   if (buttonHovered && mouseIsPressed) {
     submitDiscuss();  // Trigger the submit action when clicked
   }
+  handleFlashingText();
 }
 function submitDiscuss() {
   if (discussInput) {
@@ -737,6 +784,7 @@ function drawArtSketchStage() { //stage 6
       mouseY >= drawingAreaY && mouseY <= drawingAreaY + drawingAreaHeight) {
     drawOnCanvas(mouseX, mouseY);
   }
+  handleFlashingText();
 }
 function drawOnCanvas(x, y) {
   
