@@ -38,6 +38,9 @@ let submitButton;
 let replyButton;
 let posterSubmit;
 
+let currentDay = 1;  // Start from Day 1
+let lastMidnight = false;
+
 let tasksIcon;
 let myFont;
 let clockFont;
@@ -54,7 +57,7 @@ let isPosterStageEntered = false;
 
 let startTime;  // To store the starting time
 let elapsedTime;
-let startHour = 13;  // Start at 12:00 PM
+let startHour = 12.5;  // Start at 1:00 PM
 let startMinute = 0;
 
 let ball;
@@ -67,7 +70,10 @@ let areaX = 405;
 let areaY = 227;
 let areaWidth = 892;
 let areaHeight = 430;
-// let beachSign;
+
+
+let beachSign;
+
 // let caste1;
 // let castle2;
 // let coconut;
@@ -216,7 +222,6 @@ function setup() {
   
   sketchLayer = createGraphics(width, height);
 }
-
 function draw() {
   // Display the video on all stages if it's started
   if (videoStarted) {
@@ -237,69 +242,127 @@ function draw() {
       break;
     case 3: // Tasks stage
       drawTasksStage();
+      updateDayCounter();
+      drawDayCounter();
+      // clock();
       break;
     case 4: // Essay stage
       drawEssayStage();
+      updateDayCounter();
+      drawDayCounter();
       clock();
       break;
     case 5: // Discussion Board stage
       drawDiscussionStage();
+      updateDayCounter();
+      drawDayCounter();
       clock();
       break;
     case 6: // Art Sketch stage
       drawArtSketchStage();
+      updateDayCounter();
+      drawDayCounter();
       break;
     case 7: // Poster stage
       drawPosterStage();
+      updateDayCounter();
+      drawDayCounter();
       clock();
       break;
 
-  // if (stage === 3) {
-  //   drawTasksStage();
-  // }
 }
 }
 function clock() {
   fill("white");  // Text color
-  textFont(clockFont);  // Use the clock font
-  textAlign(CENTER, CENTER);  // Center-align the text
-  textSize(80);  // Text size
+  textFont(clockFont);
+  textAlign(CENTER, CENTER);
+  textSize(80);
 
-  elapsedTime = millis() - startTime;  // Time in milliseconds
-  let speedUpFactor = 3760;  // 24 hours / 23 seconds = 3760 seconds per second
+  // Get elapsed time in milliseconds
+  let elapsedTime = millis() - startTime;  
+
+  // Speed factor: 1 second in real-time corresponds to 3760 virtual seconds
+  let speedUpFactor = 3760;  
+
+  // Virtual time in seconds (adjusted by the speed factor)
   let virtualSeconds = (elapsedTime / 1000) * speedUpFactor;
-  let totalSeconds = virtualSeconds + (startHour * 3600 + startMinute * 60);  // Add the start time offset
-  totalSeconds = totalSeconds % 86400;  // Ensure it loops after 24 hours
 
-  let Hour = floor(totalSeconds / 3600);  // Get the hour
-  let min = floor((totalSeconds % 3600) / 60);  // Get the minute
+  // Calculate the offset for starting at 1 PM (13:00)
+  let startOffsetInSeconds = startHour * 3600 + startMinute * 60;  // Convert 1 PM to seconds
+  virtualSeconds += startOffsetInSeconds;  // Add the start offset to the virtual time
 
-  let noon = Hour >= 12 ? " PM" : " AM";
-  if (min < 10) {
-    min = "0" + min;
+  // Ensure total virtual time is wrapped around after 24 hours (86400 seconds)
+  let totalVirtualSeconds = virtualSeconds % 86400;  // 86400 seconds in a day
+
+  // Calculate hours and minutes in virtual time
+  let virtualHour = floor(totalVirtualSeconds / 3600);  // Virtual hour
+  let virtualMinute = floor((totalVirtualSeconds % 3600) / 60);  // Virtual minute
+
+  // Debugging log for virtual time
+  console.log("Virtual Time: " + virtualHour + ":" + virtualMinute);
+
+  // Format the time correctly for display
+  let noon = virtualHour >= 12 ? " PM" : " AM";
+  if (virtualMinute < 10) {
+    virtualMinute = "0" + virtualMinute;
   }
-  if (Hour === 0) {
-    Hour = 12;  // Midnight (00:xx) is 12 AM
-  } else if (Hour > 12) {
-    Hour -= 12;  // Convert hours after 12 PM (13-23) to 1-11 PM
+  if (virtualHour === 0) {
+    virtualHour = 12;  // Midnight (00:xx) should be displayed as 12 AM
+  } else if (virtualHour > 12) {
+    virtualHour -= 12;  // Convert hours after 12 PM (13-23) to 1-11 PM
   }
 
-  let clockX = 200;         // X position of the clock
-  let clockY = 620;         // Y position of the clock
-  push();  // Save the current drawing state
-  let rotationAngle = radians(-11);  // Negative for counterclockwise rotation
-  translate(clockX, clockY);  // Move the origin to the clock position
-  rotate(rotationAngle);  // Apply rotation
+  // Draw the virtual clock
+  let clockX = 200;
+  let clockY = 620;
+  push();
+  let rotationAngle = radians(-11);  // Rotate the clock slightly
+  translate(clockX, clockY);
+  rotate(rotationAngle);
+  text(virtualHour + ":" + virtualMinute + noon, 0, 0);
+  pop();
+}
+function updateDayCounter() {
+  let elapsedTime = millis() - startTime;
+  let speedUpFactor = 3760;  // Speed up factor for the virtual clock
+  let virtualSeconds = (elapsedTime / 1000) * speedUpFactor;
+  
+  // Calculate the offset for starting at 1 PM (13:00)
+  let startOffsetInSeconds = startHour * 3600 + startMinute * 60;
+  virtualSeconds += startOffsetInSeconds;  // Add the start offset to the virtual time
+  
+  // Normalize to 24 hours (86400 seconds)
+  let totalVirtualSeconds = virtualSeconds % 86400;  
 
-  text(Hour + ":" + min + noon, 0, 0);  // Centered after rotation
-  pop();  // Restore the original coordinate system
+  // Calculate the current virtual hour and minute
+  let virtualHour = floor(totalVirtualSeconds / 3600);
+  let virtualMinute = floor((totalVirtualSeconds % 3600) / 60);
+
+  // Debugging log to track virtual time
+  console.log("Virtual Time: " + virtualHour + ":" + virtualMinute);
+
+  // Check if it's exactly midnight (12:00 AM) in virtual time
+  if (virtualHour === 0 && virtualMinute === 0 && !lastMidnight) {
+    console.log(">>> It's 12:00 AM, Incrementing Day...");
+    currentDay++;  // Increment the day counter
+    lastMidnight = true;  // Prevent multiple increments during the same virtual day
+    console.log(">>> New Day: " + currentDay);
+  } else if (virtualHour !== 0 || virtualMinute !== 0) {
+    lastMidnight = false;  // Reset flag when it's not midnight
+  }
+}
+function drawDayCounter() {
+  fill(0);  // White color for the text
+  textSize(50);
+  textAlign(LEFT, TOP);
+  text("Day " + currentDay, 1380, 35);  // Display the current day at the top-left
 }
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);  // Resize canvas when window is resized
 }
 function startGeneratingTasks() {
   // Generate tasks continuously every 5 to 7 seconds
-  let randomInterval = random(4000, 10000);
+  let randomInterval = random(1000, 10000);
 
   taskGenerationTimer = setTimeout(() => {
     generateTask();  // Generate a new task
@@ -328,8 +391,6 @@ function generateTask() {
   updateTaskListDiv();  
   console.log("Task generated:", newTask);
 }
-
-// Function to reshuffle the taskPool (if empty)
 function reshuffleTaskPool() {
   // Refill taskPool with all the tasks that have been used
   taskPool = [
@@ -352,7 +413,6 @@ function reshuffleTaskPool() {
   shuffleArray(taskPool);
   console.log("Task pool reshuffled.");
 }
-
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
     let j = floor(random(i + 1));
@@ -373,7 +433,6 @@ function updateTaskListDiv() {
     taskListDiv.child(taskDiv);
   }
 }
-
 function removeTask(index) {
   taskList.splice(index, 1);
 }
@@ -816,6 +875,11 @@ function drawRestrictedAreaBorder() {
   // Draw the rectangle (border) around the restricted area
   rect(areaX, areaY, areaWidth, areaHeight);
 }
+
+
+
+
+
 function drawDraggableBall() {
   // Calculate the new width and height based on the scale factor
   let scaledWidth = ball.width * scaleFactor;
@@ -867,6 +931,7 @@ function isMouseOverBall() {
 function setBallScale(newScale) {
   scaleFactor = newScale;  // Change the scale of the ball
 }
+
 //===============================================================================================================================================================
 function drawButton(x, y, w, h, label, callback) {
   let buttonHovered = mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h;
