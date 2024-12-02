@@ -4,7 +4,6 @@ let start;
 let mainDesk;
 let essay;
 let discuss;
-let poster;
 let sketch;
 let tasks;
 let taskList = []; // Start with an empty task list
@@ -38,7 +37,7 @@ let drawingAreaHeight = 587;
 
 let submitButton;
 let replyButton;
-let posterSubmit;
+
 
 let currentDay = 1;  // Start from Day 1
 let lastMidnight = false;
@@ -55,7 +54,7 @@ let tasksActive = false;
 let isEssayStageEntered = false;
 let isDiscussStageEntered = false;
 let isArtSketchStageEntered = false;
-let isPosterStageEntered = false;
+
 
 let startTime;  // To store the starting time
 let elapsedTime;
@@ -93,7 +92,7 @@ function preload() {
   mainDesk = loadImage('assets/desk.png');
   essay = loadImage('assets/essay.png');
   discuss = loadImage('assets/discuss.png');
-  poster = loadImage('assets/poster.png');
+
   tasks = loadImage('assets/tasks1.png');
   sketch = loadImage('assets/sketch.png');
   tasksIcon = loadImage('assets/tasks button.png');
@@ -105,7 +104,7 @@ function preload() {
   // Buttons
   submitButton = loadImage('assets/submit.png');
   replyButton = loadImage('assets/reply.png');
-  posterSubmit = loadImage('assets/poster submit.png');
+
   pencil = loadImage('assets/pencil.png', function() {
     // Calculate the aspect ratio
     let aspectRatio = pencil.width / pencil.height;
@@ -389,7 +388,7 @@ function reshuffleTaskPool() {
   // Refill taskPool with all the tasks that have been used
   taskPool = [
     { task: "500-word Essay", stage: 4 },
-    { task: "Poster", stage: 7 },
+    { task: "first impressions of reading", stage: 5 },
     { task: "portrait", stage: 6 },
     { task: "Discussion Board", stage: 5 },
     { task: "reading response", stage: 4 },
@@ -399,8 +398,8 @@ function reshuffleTaskPool() {
     { task: "contour drawing", stage: 6 },
     { task: "sketch", stage: 6 },
     { task: "art draft", stage: 6 },
-    { task: "one-pager", stage: 7 },
-    { task: "graphic", stage: 7 }
+    { task: "landscape drawing", stage: 6 },
+    { task: "respond to classmate", stage: 5 }
   ];
 
   // Optional: Shuffle the taskPool to randomize the order
