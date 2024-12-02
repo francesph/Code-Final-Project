@@ -557,9 +557,8 @@ function drawTasksStage() {  // Stage 3
   let tasksY = (windowHeight - tasksHeight) / 2;
   image(tasks, tasksX, tasksY, tasksWidth, tasksHeight);  // Display the tasks image centered
 
-  // Move the task list container to the right by increasing the X position
-  let taskContainerX = 620;  // Shift the task container to the right (increased from windowWidth / 4)
-  let taskContainerY = tasksY + 175;  // Position task list above the tasks image (50px above)
+  let taskContainerX = 620;  
+  let taskContainerY = tasksY + 175;  
   let taskContainerWidth = windowWidth / 2;
   let taskContainerHeight = windowHeight * 0.4;
 
@@ -572,11 +571,11 @@ function drawTasksStage() {  // Stage 3
   fill("black");
   textSize(26);
 
-  // Loop through the taskList and display the tasks
+
   for (let i = 0; i < taskList.length; i++) {
     let task = taskList[i];
 
-    let buttonWidth = 300;  // Width of the task item button
+    let buttonWidth = 300;  
     let buttonX = taskContainerX + 10;  // Padding from the left
     let buttonY = taskY + i * lineSpacing;  // Space between tasks
 
@@ -591,13 +590,13 @@ function drawTasksStage() {  // Stage 3
     text(task.task, buttonX + 10, buttonY + 10);
 
     if (isHovered && mouseIsPressed) {
-      currentTask = task.task;  // Set the current task to the clicked task
-      stage = task.stage;  // Navigate to the corresponding task stage
+      currentTask = task.task; 
+      stage = task.stage;  
     
-      // Optionally: Remove the clicked task from the task list immediately
+  
       taskList.splice(i, 1); 
     
-      // Optionally log the task navigation for debugging purposes
+ 
       console.log("Navigating to stage:", stage);
     }
     handleFlashingText();
@@ -627,16 +626,16 @@ function drawEssayStage() {  // Stage 4
       essayInput.elt.style.resize = 'none';
     }
 
-    // Clear the text input only when first entering the essay stage
+    // Clear the text input 
     if (!isEssayStageEntered) {
-      essayInput.value('');  // Reset the content to empty string
-      isEssayStageEntered = true;  // Set the flag to true so it doesn't clear again
+      essayInput.value('');  
+      isEssayStageEntered = true;  
     }
 
-    image(essay, 0, 0, width, height);  // Background image for essay page
+    image(essay, 0, 0, width, height);  
     fill("black");
     quad(80, 610, 330, 560, 330, 640, 80, 690)
-    essayInput.show();  // Show the input field
+    essayInput.show();  
 
     // Submit button
     fill("#e6aa90");
@@ -654,20 +653,20 @@ function drawEssayStage() {  // Stage 4
     let buttonHovered = mouseX >= buttonX && mouseX <= buttonX + buttonWidth &&
                         mouseY >= buttonY && mouseY <= buttonY + buttonHeight;
 
-    // Provide hover feedback (optional)
+   
     if (buttonHovered) {
-      cursor(HAND);  // Change cursor to a hand when hovering over the button
-      fill("#f2c6b3");  // Change color when hovered
-      rect(buttonX, buttonY, buttonWidth, buttonHeight, 3);  // Re-draw the button with hover color
+      cursor(HAND);  
+      fill("#f2c6b3");  
+      rect(buttonX, buttonY, buttonWidth, buttonHeight, 3);  
       fill(0);
-      text('Submit', 1238, 178.5);  // Redraw the text on the button
+      text('Submit', 1238, 178.5);  
     } else {
-      cursor(ARROW);  // Default arrow cursor
+      cursor(ARROW);  
     }
 
     // Detect button click
     if (buttonHovered && mouseIsPressed) {
-      submitEssay();  // Trigger the submit action when clicked
+      submitEssay();  
     }
     handleFlashingText();
     updateWordCount();
@@ -676,9 +675,9 @@ function drawEssayStage() {  // Stage 4
   
 }
 function submitEssay() {
-  // Hide the input field and submit button when submitting the essay
+
   if (essayInput) {
-    essayInput.hide();  // Hide the textarea input when leaving the essay stage
+    essayInput.hide();  
   }
   stage = 3;  // Switch to tasks page
   isEssayStageEntered = false;
@@ -698,22 +697,22 @@ function drawDiscussionStage() { //stage 5
     discussInput.size(555, 182);
     discussInput.attribute('placeholder', 'Type your response here...');
     discussInput.elt.style.textAlign = 'left'; // Align text to the left
-    discussInput.elt.style.padding = '10px';  // Add padding for better appearance
+    discussInput.elt.style.padding = '10px';  
     discussInput.elt.style.resize = 'none';
     discussInput.hide();
   }
   if (!isDiscussStageEntered) {
     discussInput.value('');  // Reset the content to empty string
-    isDiscussStageEntered = true;  // Set the flag to true so it doesn't clear again
+    isDiscussStageEntered = true;  
   }
 
   image(discuss, 0, 0, width, height);
   fill("black");
   quad(80, 610, 330, 560, 330, 640, 80, 690)
-  // Show the input field for the discussion stage
+
   discussInput.show();
 
-  // Set text alignment for the discussion input (instructions text)
+  
   textAlign(LEFT, TOP);
   fill(0);
   textSize(24);
@@ -733,18 +732,18 @@ function drawDiscussionStage() { //stage 5
   let buttonHovered = mouseX >= buttonX && mouseX <= buttonX + buttonWidth &&
                       mouseY >= buttonY && mouseY <= buttonY + buttonHeight;
 
-  // Provide hover feedback (optional)
+
   if (buttonHovered) {
-    cursor(HAND);  // Change cursor to a hand when hovering over the button
-    fill("#f2c6b3");  // Change color when hovered
-    rect(buttonX, buttonY, buttonWidth, buttonHeight, 6);  // Re-draw the button with hover color
+    cursor(HAND);  
+    fill("#f2c6b3");  
+    rect(buttonX, buttonY, buttonWidth, buttonHeight, 6);  
     fill(0);
-    text('Reply', 1049, 605);  // Redraw the text on the button
+    text('Reply', 1049, 605);  
   } else {
-    cursor(ARROW);  // Default arrow cursor
+    cursor(ARROW);  
   }
 
-  // Detect button click
+
   if (buttonHovered && mouseIsPressed) {
     submitDiscuss();  // Trigger the submit action when clicked
   }
@@ -752,7 +751,7 @@ function drawDiscussionStage() { //stage 5
 }
 function submitDiscuss() {
   if (discussInput) {
-    discussInput.hide();  // Hide the textarea input when leaving the essay stage
+    discussInput.hide();  
   }
   stage = 3;
   isDiscussStageEntered = false;
@@ -764,18 +763,18 @@ function drawArtSketchStage() { //stage 6
   // Draw the sketch background
   image(sketch, 0, 0, width, height);
 
-  // Draw the user's sketch (from the sketchLayer)
+
   image(sketchLayer, 0, 0);
 
   image(pencil, mouseX - pencil.width / 3.2, mouseY - pencil.height / 1.099);
-  // Draw a border around the drawing area for visualization (optional)
-  fill(255, 255, 255, 0);  // Red with some transparency for the border
+
+  fill(255, 255, 255, 0);  
   noStroke();
-  rect(drawingAreaX, drawingAreaY, drawingAreaWidth, drawingAreaHeight);  // Draw the restricted drawing area
+  rect(drawingAreaX, drawingAreaY, drawingAreaWidth, drawingAreaHeight);  
   
   // Button styling
   fill("#e6aa90");
-  rect(1100, 689.5, 83.5, 24.5, 4);  // Draw the button
+  rect(1100, 689.5, 83.5, 24.5, 4);  
   textFont(bandiFont);
   textSize(15.5);
   fill(0);
@@ -791,23 +790,23 @@ function drawArtSketchStage() { //stage 6
   let buttonHovered = mouseX >= buttonX && mouseX <= buttonX + buttonWidth &&
                       mouseY >= buttonY && mouseY <= buttonY + buttonHeight;
 
-  // Provide hover feedback (optional)
+
   if (buttonHovered) {
-    cursor(HAND);  // Change cursor to hand when hovering over the button
-    fill("#f2c6b3");  // Change button color when hovered
-    rect(buttonX, buttonY, buttonWidth, buttonHeight, 4);  // Re-draw the button with hover color
+    cursor(HAND);  
+    fill("#f2c6b3");  
+    rect(buttonX, buttonY, buttonWidth, buttonHeight, 4);  
     fill(0);
-    text('Submit', 1120, 693.5);  // Redraw the text on the button
+    text('Submit', 1120, 693.5);  
   } else {
-    cursor(ARROW);  // Default arrow cursor when not hovering
+    cursor(ARROW);  
   }
 
-  // Detect button click
+ 
   if (buttonHovered && mouseIsPressed) {
-    submitArtSketch();  // Trigger the submit action when clicked
+    submitArtSketch(); 
   }
   
-  // Draw with mouse inside the defined area
+
   if (mouseIsPressed && mouseX >= drawingAreaX && mouseX <= drawingAreaX + drawingAreaWidth &&
       mouseY >= drawingAreaY && mouseY <= drawingAreaY + drawingAreaHeight) {
     drawOnCanvas(mouseX, mouseY);
@@ -816,31 +815,18 @@ function drawArtSketchStage() { //stage 6
 }
 function drawOnCanvas(x, y) {
   
-  sketchLayer.stroke(0);  // Set stroke color (black)
-  sketchLayer.strokeWeight(4);  // Set stroke weight (thickness of the line)
-  sketchLayer.line(pmouseX, pmouseY, x, y);  // Draw a line from previous mouse position to current
+  sketchLayer.stroke(0);  
+  sketchLayer.strokeWeight(4);  
+  sketchLayer.line(pmouseX, pmouseY, x, y);  
 }
 function submitArtSketch() {
-  // Clear the sketch layer to reset the drawing
-  sketchLayer.clear();  // This removes everything from the sketchLayer
 
-  // Set the stage to 3 to switch to the tasks page
+  sketchLayer.clear();  
   stage = 3;  // Change to tasks stage
 
-  // Optionally reset flags or perform any cleanup (if needed)
-  isArtSketchStageEntered = false;  // Reset the flag (if relevant)
+  isArtSketchStageEntered = false;  
 }
 //===============================================================================================================================================================
-
-// function drawRestrictedAreaBorder() {
-//   // Set border color and thickness
-//   stroke(0);  // Black border color
-//   strokeWeight();  // Border thickness
-//   noFill();  // No fill color inside the rectangle
-
-//   // Draw the rectangle (border) around the restricted area
-//   rect(areaX, areaY, areaWidth, areaHeight);
-// }
 
 //===============================================================================================================================================================
 function drawButton(x, y, w, h, label, callback) {
@@ -852,18 +838,18 @@ function drawButton(x, y, w, h, label, callback) {
   text(label, x + w / 2, y + h / 2);
 
   if (buttonHovered && mouseIsPressed) {
-    callback();  // Call the callback function (e.g., change stage)
+    callback();  
   }
 }
 
 //===============================================================================================================================================================
 function updateEssayText() {
-  // Store the value typed in the essay input field
+
   essayText = essayInput.value();
 }
 //===============================================================================================================================================================
 function updateDiscussText() {
-  // Store the value typed in the discussion input field
+
   discussText = discussInput.value();
 }
 //===============================================================================================================================================================
@@ -875,10 +861,10 @@ function mousePressed() {
 }
 //===============================================================================================================================================================
 function removeTaskFromList() {
-  // Make sure there is a task in the list to remove
+ 
   if (taskList.length > 0) {
-    // Remove the first task (or whatever logic you need)
-    taskList.splice(0, 1);  // Example: remove the first task in the list
-    updateTaskListDiv();  // Update the task list UI after removal
+
+    taskList.splice(0, 1);  
+    updateTaskListDiv();  
   }
 }
