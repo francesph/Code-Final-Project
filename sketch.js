@@ -67,8 +67,8 @@ let areaY = 227;
 let areaWidth = 892;
 let areaHeight = 430;
 
-let lastFlashTime = 0; // Variable to keep track of the last flash time
-let flashInterval = 1000; // Time in milliseconds for each flash (1 second)
+let lastFlashTime = 0;
+let flashInterval = 1000; // flash (1 second)
 let flashMessages = [
   "Work faster!",
   "Are you lazy? You should be done by now!",
@@ -77,7 +77,7 @@ let flashMessages = [
   "these assignments aren't even hard, why is it taking you this long",
   "just a few more assignments and then you can enjoy the weekend"
 ];
-let currentFlashMessage = "";  // Store the current flashing message
+let currentFlashMessage = "";  
 let showText = false;
 
 let wordCount=0;
@@ -106,16 +106,12 @@ function preload() {
   replyButton = loadImage('assets/reply.png');
 
   pencil = loadImage('assets/pencil.png', function() {
-    // Calculate the aspect ratio
     let aspectRatio = pencil.width / pencil.height;
 
-    // Desired width (you can change this value to any desired width)
     let newWidth = 672;
 
-    // Calculate the new height to maintain the aspect ratio
     let newHeight = newWidth / aspectRatio;
 
-    // Resize the pencil image while maintaining aspect ratio
     pencil.resize(newWidth, newHeight);
 
     console.log('Pencil image loaded and resized:', pencil.width, pencil.height);
@@ -128,25 +124,25 @@ function setup() {
   textFont(myFont);
 
 
-  sunrise.loop();  // Ensure the video will loop
-  sunrise.volume(0);  // Optional: mute the video
+  sunrise.loop(); 
+
 
   essayInput = createElement('textarea', '');
   essayInput.position(608.5, 240);
   essayInput.size(525, 350);
   essayInput.attribute('placeholder', 'Type your essay here...');
-  essayInput.elt.style.textAlign = 'left';  // Align text to the left (using raw DOM style)
-  essayInput.elt.style.padding = '10px';    // Add padding for better appearance
+  essayInput.elt.style.textAlign = 'left'; 
+  essayInput.elt.style.padding = '10px';  
   essayInput.elt.style.resize = 'none';
   essayInput.elt.style.border = 'none';
-  essayInput.hide(); // Initially hidden, only shown in the essay stage
+  essayInput.hide(); 
 
   discussInput = createElement('textarea', '');
   discussInput.position(543, 358);
   discussInput.size(555, 182);
   discussInput.attribute('placeholder', 'Type your response here...');
   discussInput.elt.style.textAlign = 'left'; // Align text to the left
-  discussInput.elt.style.padding = '10px';  // Add padding for better appearance
+  discussInput.elt.style.padding = '10px'; 
   discussInput.elt.style.resize = 'none';
   discussInput.elt.style.border = 'none';
   discussInput.hide();
@@ -157,13 +153,13 @@ function setup() {
   taskContainer.style('left', '20px');
   taskContainer.style('width', '80%');
   taskContainer.style('height', '400px');
-  taskContainer.style('overflow-y', 'scroll');  // Enable vertical scrolling
+  taskContainer.style('overflow-y', 'scroll');  
   taskContainer.style('background-color', 'rgba(255, 255, 255, 0.8)');
   taskContainer.style('border-radius', '10px');
   taskContainer.style('padding', '10px');
   taskContainer.hide(); // Hide it initially, show it only on tasks page
   
-  // Initialize the div for tasks to be added inside the container
+
   taskListDiv = createDiv();
   taskContainer.child(taskListDiv);
 
@@ -222,38 +218,34 @@ function draw() {
 
 }
 function updateWordCount() {
-  // Get the text from the input field
+
   let inputText = essayInput.value();
   
-  // Split the input text into words based on spaces
-  // Remove leading/trailing spaces and split by one or more spaces
   let words = inputText.trim().split(/\s+/);
   
-  // Update the word count (exclude empty strings)
+
   wordCount = words.filter(word => word.length > 0).length;
 }
 function displayWordCount() {
   fill("black");
   textSize(15);
-  text("Word Count: " + wordCount, 470, 630);  // Display word count near the top
+  text("Word Count: " + wordCount, 470, 630);  
 }
 function handleFlashingText() {
-  // Get the current time in milliseconds
+
   let currentTime = millis();
 
-  // Check if the flash interval has passed
+
   if (currentTime - lastFlashTime >= flashInterval) {
-    // Toggle the visibility of the flashing text
+
     showText = !showText;
 
-    // Update the last flash time to the current time
     lastFlashTime = currentTime;
 
-    // Randomly pick a new message from the array
+
     currentFlashMessage = random(flashMessages);
   }
 
-  // Show the flashing text if 'showText' is true
   if (showText) {
     push();  
     
@@ -261,7 +253,6 @@ function handleFlashingText() {
     textSize(32); 
     textAlign(CENTER, TOP); 
 
-    // Draw the flashing text at the center of the screen
     text(currentFlashMessage, width / 2, 30);
   
     pop();
@@ -273,13 +264,13 @@ function clock() {
   textAlign(CENTER, CENTER);
   textSize(80);
 
-  // Get elapsed time in milliseconds
+
   let elapsedTime = millis() - startTime;  
 
-  // Speed factor: 1 second in real-time corresponds to 3760 virtual seconds
+
   let speedUpFactor = 3760;  
 
-  // Virtual time in seconds (adjusted by the speed factor)
+
   let virtualSeconds = (elapsedTime / 1000) * speedUpFactor;
 
 
@@ -289,13 +280,10 @@ function clock() {
   let totalVirtualSeconds = virtualSeconds % 86400;  
 
 
-  let virtualHour = floor(totalVirtualSeconds / 3600);  // Virtual hour
-  let virtualMinute = floor((totalVirtualSeconds % 3600) / 60);  // Virtual minute
+  let virtualHour = floor(totalVirtualSeconds / 3600);  //  hour
+  let virtualMinute = floor((totalVirtualSeconds % 3600) / 60);  // minute
 
-  // Debugging log for virtual time
-  console.log("Virtual Time: " + virtualHour + ":" + virtualMinute);
 
-  // Format the time correctly for display
   let noon = virtualHour >= 12 ? " PM" : " AM";
   if (virtualMinute < 10) {
     virtualMinute = "0" + virtualMinute;
@@ -309,7 +297,7 @@ function clock() {
   let clockX = 200;
   let clockY = 620;
   push();
-  let rotationAngle = radians(-11);  // Rotate the clock slightly
+  let rotationAngle = radians(-11);  
   translate(clockX, clockY);
   rotate(rotationAngle);
   text(virtualHour + ":" + virtualMinute + noon, 0, 0);
@@ -324,57 +312,51 @@ function updateDayCounter() {
   let startOffsetInSeconds = startHour * 3600 + startMinute * 60;
   virtualSeconds += startOffsetInSeconds;  
   
-  // Normalize to 24 hours (86400 seconds)
+  //24 hours (86400 seconds)
   let totalVirtualSeconds = virtualSeconds % 86400;  
-
-  // Calculate the current virtual hour and minute
   let virtualHour = floor(totalVirtualSeconds / 3600);
   let virtualMinute = floor((totalVirtualSeconds % 3600) / 60);
 
-
-  console.log("Virtual Time: " + virtualHour + ":" + virtualMinute);
-
-
   if (virtualHour === 0 && virtualMinute === 0 && !lastMidnight) {
     console.log(">>> It's 12:00 AM, Incrementing Day...");
-    currentDay++;  // Increment the day counter
-    lastMidnight = true;  // Prevent multiple increments during the same virtual day
+    currentDay++;  
+    lastMidnight = true; 
     console.log(">>> New Day: " + currentDay);
   } else if (virtualHour !== 0 || virtualMinute !== 0) {
-    lastMidnight = false;  // Reset flag when it's not midnight
+    lastMidnight = false; 
   }
 }
 function drawDayCounter() {
-  fill(0);  // White color for the text
+  fill(0);  
   textSize(50);
   textAlign(LEFT, TOP);
-  text("Day " + currentDay, 1380, 35);  // Display the current day at the top-left
+  text("Day " + currentDay, 1380, 35);  
 }
 function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);  // Resize canvas when window is resized
+  resizeCanvas(windowWidth, windowHeight);  
 }
 function startGeneratingTasks() {
 
   let randomInterval = random(1000, 10000); //1-10 seconds
 
   taskGenerationTimer = setTimeout(() => {
-    generateTask();  // Generate a new task
-    startGeneratingTasks();  // Recursively keep generating tasks
+    generateTask();  
+    startGeneratingTasks();  
   }, randomInterval);
 }
 function generateTask() {
-  // If there are already 12 tasks, stop generating more
+  // If already 12 tasks, stop generating more
   if (taskList.length >= maxTasks) {
     return; // Don't generate more tasks until there's space
   }
 
-  // Check if there are tasks left in the pool
+  // Check tasks left
   if (taskPool.length === 0) {
     console.log("Reshuffling tasks...");
-    reshuffleTaskPool(); // Reshuffle when pool is empty
+    reshuffleTaskPool(); // Reshuffle
   }
 
-  // Randomly pick a task from the taskPool
+  // Randomly pick
   let randomIndex = floor(random(taskPool.length));
   let newTask = taskPool.splice(randomIndex, 1)[0]; // Remove and get the selected task
 
@@ -385,7 +367,6 @@ function generateTask() {
   console.log("Task generated:", newTask);
 }
 function reshuffleTaskPool() {
-  // Refill taskPool with all the tasks that have been used
   taskPool = [
     { task: "500-word Essay", stage: 4 },
     { task: "first impressions of reading", stage: 5 },
@@ -402,7 +383,6 @@ function reshuffleTaskPool() {
     { task: "respond to classmate", stage: 5 }
   ];
 
-  // Optional: Shuffle the taskPool to randomize the order
   shuffleArray(taskPool);
   console.log("Task pool reshuffled.");
 }
@@ -413,9 +393,9 @@ function shuffleArray(array) {
   }
 }
 function updateTaskListDiv() {
-  taskListDiv.html(''); // Clear the existing list before re-adding tasks
+  taskListDiv.html(''); // Clear 
   
-  // Display tasks from the list
+  // Display tasks from list
   for (let i = 0; i < taskList.length; i++) {
     let task = taskList[i];
     let taskDiv = createDiv(task.task);
@@ -436,51 +416,50 @@ function drawStartPage() {
   textSize(12)
   text("Music: https://www.bensound.com License code: RRF6OPMJLACN0KSW   Lee, Hyum-Seung Hahm, Dae-Hoon Designers", 280,820)
 
-  // Define button position and size
+
   let buttonX = windowWidth / 2 - 75;
   let buttonY = windowHeight / 1.6 - 25;
   let buttonWidth = 150;
   let buttonHeight = 50;
 
-  // Check if the mouse is over the button
+
   let buttonHovered = mouseX >= buttonX && mouseX <= buttonX + buttonWidth &&
                       mouseY >= buttonY && mouseY <= buttonY + buttonHeight;
 
-  // Set button color based on hover state
   fill(buttonHovered ? "#c8b699" : "#e1cdb0");
-  rect(buttonX, buttonY, buttonWidth, buttonHeight);  // Draw the rectangle
+  rect(buttonX, buttonY, buttonWidth, buttonHeight);  
 
-  // Draw the "Start" text in the center of the button
+
   textSize(30);
   fill("black");
-  textAlign(CENTER, CENTER);  // Center the text both horizontally and vertically
+  textAlign(CENTER, CENTER);  
   text("START", buttonX + buttonWidth / 2, buttonY + buttonHeight / 2);
 
-  // Move to the next stage when the button is clicked
+
   if (buttonHovered && mouseIsPressed) {
-    console.log("Start button clicked!");  // This will confirm the button is being clicked
+    console.log("Start button clicked!");  
     stage = 1;
     startSound();
   }
 }
 
 function startSound() {
-  // Get the AudioContext and resume it
+
   let audioContext = getAudioContext();
   if (audioContext.state === 'suspended') {
     audioContext.resume().then(() => {
       console.log('AudioContext resumed');
       if (!song.isPlaying()) {
-        song.loop();  // Start the sound and make it loop
-        song.setVolume(1);  // Set volume to full
+        song.loop();  
+        song.setVolume(1); 
         console.log('Song is playing now!');
       }
     });
   } else {
-    // If AudioContext is already running, just play the sound
+  
     if (!song.isPlaying()) {
-      song.loop();  // Start the sound and make it loop
-      song.setVolume(1);  // Set volume to full
+      song.loop(); 
+      song.setVolume(1);  
       console.log('Song is playing now!');
     }
   }
@@ -496,15 +475,15 @@ function drawMessageStage() { // Stage 1
   // Center the message box
   let boxWidth = windowWidth * 0.5;  
   let boxHeight = windowHeight * 0.5; 
-  let boxX = (windowWidth - boxWidth) / 2;  // Center the box horizontally
-  let boxY = (windowHeight - boxHeight) / 2;  // Center the box vertically 
+  let boxX = (windowWidth - boxWidth) / 2; 
+  let boxY = (windowHeight - boxHeight) / 2;  
   // Draw the message box 
   fill(0);
   rect(boxX, boxY, boxWidth, boxHeight, 5);
 
-  // Display the text inside the message box
-  fill(255);  // Text color (white)
-  textAlign(CENTER, CENTER);  // Align text to center both horizontally and vertically
+
+  fill(255);  
+  textAlign(CENTER, CENTER);  
   textSize(windowWidth * 0.05);
   
   let line1 = "I dont have much ";
@@ -526,10 +505,9 @@ function drawMessageStage() { // Stage 1
 
   let buttonWidth = 150; 
   let buttonHeight = 50; 
-  // let buttonX = 868;
-  // let buttonY = 467;
-  let buttonX = (windowWidth - buttonWidth) / 2;  // Center horizontally
-  let buttonY = boxY + boxHeight - 65;  // Position button below the message box (with padding)
+
+  let buttonX = (windowWidth - buttonWidth) / 2;  
+  let buttonY = boxY + boxHeight - 65;  
 
   // View Tasks Button hover area
   let viewTasksButtonHovered = mouseX >= buttonX && mouseX <= buttonX + buttonWidth &&
@@ -540,13 +518,13 @@ function drawMessageStage() { // Stage 1
   fill("black");
   textSize(29);
   textAlign(CENTER, CENTER);
-  text("View Tasks", buttonX + buttonWidth / 2, buttonY + buttonHeight / 2);  // Center the text
+  text("View Tasks", buttonX + buttonWidth / 2, buttonY + buttonHeight / 2);  
 
-  // Move to tasks stage when clicked
+
   if (viewTasksButtonHovered && mouseIsPressed) {
     prevStage = stage;
     stage = 3;  // Move to tasks stage
-    tasksActive = true;  // Enable task interaction after clicking "View Tasks"
+    tasksActive = true;  
   }
 }
 //===============================================================================================================================================================
@@ -558,7 +536,7 @@ function drawMainDeskStage() { //stage 2
 }
 //===============================================================================================================================================================
 function drawTasksStage() {  // Stage 3
-  if (!tasksActive) return;  // Do nothing if tasks are not active
+  if (!tasksActive) return; 
   
   // Clear the background and display tasks
   background(200); 
@@ -566,13 +544,13 @@ function drawTasksStage() {  // Stage 3
   if (videoStarted) {
     let sunriseWidth = windowWidth * 0.5;
     let sunriseHeight = sunrise.height * (sunriseWidth / sunrise.width);
-    image(sunrise, -70, -20, sunriseWidth * 1.2, sunriseHeight * 1.2);  // Display video in top-left corner
+    image(sunrise, -70, -20, sunriseWidth * 1.2, sunriseHeight * 1.2);  
   }
 
   // Display the main desk image
   image(mainDesk, 0, -42, width, height * 1.08);
 
-  // Center the tasks image both vertically and horizontally
+ 
   let tasksWidth = windowWidth * 0.8;
   let tasksHeight = tasks.height * (tasksWidth / tasks.width);
   let tasksX = (windowWidth - tasksWidth) / 2;
