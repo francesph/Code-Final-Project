@@ -6,6 +6,11 @@ let essay;
 let discuss;
 let sketch;
 let tasks;
+
+let overallProgress = 0;  // Start at 0% progress
+let currentProgress = 0;  // smooth transitions
+
+let taskPage;
 let taskList = []; // Start with an empty task list
 let taskPool = [
   { task: "500-word Essay", stage: 4 },
@@ -82,7 +87,7 @@ let showText = false;
 
 let wordCount=0;
 
-// Preload assets
+//=============================================================================================
 function preload() {
   start = loadImage('assets/start page.png');
   song = loadSound("assets/floatinggarden.mp3");
@@ -94,16 +99,14 @@ function preload() {
   discuss = loadImage('assets/discuss.png');
 
   tasks = loadImage('assets/tasks1.png');
+  taskPage = loadImage('assets/tasks.png');
   sketch = loadImage('assets/sketch.png');
-  tasksIcon = loadImage('assets/tasks button.png');
+
 
   myFont = loadFont('assets/FsHandwriting-Regular.ttf');
   clockFont = loadFont('assets/DS-DIGII.TTF');
   bandiFont = loadFont('assets/Core Bandi Face.ttf');
 
-  // Buttons
-  submitButton = loadImage('assets/submit.png');
-  replyButton = loadImage('assets/reply.png');
 
   pencil = loadImage('assets/pencil.png', function() {
     let aspectRatio = pencil.width / pencil.height;
@@ -120,7 +123,7 @@ function preload() {
   });
 }
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(1513,831);
   textFont(myFont);
 
 
@@ -174,8 +177,8 @@ function setup() {
 function draw() {
   // Display the video on all stages if it's started
   if (videoStarted) {
-    let sunriseWidth = windowWidth * 0.5;
-    let sunriseHeight = sunrise.height * (sunriseWidth / sunrise.width);
+    let sunriseWidth = 750
+    let sunriseHeight = 420
     image(sunrise, -70, -20, sunriseWidth * 1.2, sunriseHeight * 1.2);  // Display video in top-left corner
   }
 
@@ -193,6 +196,7 @@ function draw() {
       drawTasksStage();
       updateDayCounter();
       drawDayCounter();
+      
       // clock();
       break;
     case 4: // Essay stage
@@ -200,22 +204,46 @@ function draw() {
       updateDayCounter();
       drawDayCounter();
       clock();
-
+     
       break;
     case 5: // Discussion Board stage
       drawDiscussionStage();
       updateDayCounter();
       drawDayCounter();
       clock();
+     
       break;
     case 6: // Art Sketch stage
       drawArtSketchStage();
       updateDayCounter();
       drawDayCounter();
-
+      
       break;
   }
+  let progressSpeed = 0.05;  // How quickly the bar fills up (higher value = faster)
+  currentProgress = lerp(currentProgress, overallProgress, progressSpeed);
+}
+function drawProgressBar(stageName, progress, x, y) {
+  let barWidth = 30;  // The width of the progress bar (making it vertical)
+  let barHeight = 500;  // The height of the progress bar (can be adjusted)
+  
+  // Draw the background of the progress bar
+  fill(200);  // Light gray color for the background of the bar
+  noStroke();
+  rect(x - barWidth / 2, y - barHeight / 2, barWidth, barHeight); // Centered vertically and aligned to the right
 
+  // Draw the progress fill (based on progress value), starting from the bottom
+  fill(0, 200, 0);  // Green color for the progress
+  let progressHeight = barHeight * progress; // Height of the filled section
+  rect(x - barWidth / 2, y + barHeight / 2 - progressHeight, barWidth, progressHeight); // Starting from the bottom
+
+  // Draw the stage name and the progress percentage
+  fill(0);
+  textSize(18);
+  textAlign(CENTER, CENTER);
+  text(stageName, x, y - barHeight / 2 - 20);  // Draw the stage name above the bar
+  textSize(14);
+  text(Math.round(progress * 100) + "%", x, y);  // Draw progress percentage at the center of the bar
 }
 function updateWordCount() {
 
@@ -266,23 +294,15 @@ function clock() {
 
 
   let elapsedTime = millis() - startTime;  
-
-
   let speedUpFactor = 3760;  
-
-
   let virtualSeconds = (elapsedTime / 1000) * speedUpFactor;
-
-
   let startOffsetInSeconds = startHour * 3600 + startMinute * 60;  
   virtualSeconds += startOffsetInSeconds;  
 
   let totalVirtualSeconds = virtualSeconds % 86400;  
 
-
   let virtualHour = floor(totalVirtualSeconds / 3600);  //  hour
   let virtualMinute = floor((totalVirtualSeconds % 3600) / 60);  // minute
-
 
   let noon = virtualHour >= 12 ? " PM" : " AM";
   if (virtualMinute < 10) {
@@ -328,16 +348,14 @@ function updateDayCounter() {
 }
 function drawDayCounter() {
   fill(0);  
+  textFont(myFont);
   textSize(50);
   textAlign(LEFT, TOP);
   text("Day " + currentDay, 1380, 35);  
 }
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);  
-}
 function startGeneratingTasks() {
 
-  let randomInterval = random(1000, 10000); //1-10 seconds
+  let randomInterval = random(1000, 1000); //1-10 seconds
 
   taskGenerationTimer = setTimeout(() => {
     generateTask();  
@@ -412,16 +430,16 @@ function removeTask(index) {
 //===============================================================================================================================================================
 function drawStartPage() {
   image(start, 0, 0, width, height);
-  fill(0)
-  textSize(12)
-  text("Music: https://www.bensound.com License code: RRF6OPMJLACN0KSW   Lee, Hyum-Seung Hahm, Dae-Hoon Designers", 280,820)
+  
+  fill(0);
+  textSize(12);
+  text("Music: https://www.bensound.com License code: RRF6OPMJLACN0KSW   Lee, Hyum-Seung Hahm, Dae-Hoon Designers", 280, 820);
 
-
-  let buttonX = windowWidth / 2 - 75;
-  let buttonY = windowHeight / 1.6 - 25;
   let buttonWidth = 150;
   let buttonHeight = 50;
 
+  let buttonX = width / 2 - buttonWidth / 2;
+  let buttonY = height / 1.6 - buttonHeight / 2;
 
   let buttonHovered = mouseX >= buttonX && mouseX <= buttonX + buttonWidth &&
                       mouseY >= buttonY && mouseY <= buttonY + buttonHeight;
@@ -429,34 +447,29 @@ function drawStartPage() {
   fill(buttonHovered ? "#c8b699" : "#e1cdb0");
   rect(buttonX, buttonY, buttonWidth, buttonHeight);  
 
-
   textSize(30);
   fill("black");
-  textAlign(CENTER, CENTER);  
+  textAlign(CENTER, CENTER);
   text("START", buttonX + buttonWidth / 2, buttonY + buttonHeight / 2);
 
-
   if (buttonHovered && mouseIsPressed) {
-    console.log("Start button clicked!");  
+    console.log("Start button clicked!");
+    startSound();  // Ensure the sound starts when the start button is clicked
     stage = 1;
-    startSound();
   }
 }
-
 function startSound() {
-
   let audioContext = getAudioContext();
   if (audioContext.state === 'suspended') {
     audioContext.resume().then(() => {
       console.log('AudioContext resumed');
       if (!song.isPlaying()) {
-        song.loop();  
-        song.setVolume(1); 
+        song.loop();  // Start looping the song
+        song.setVolume(1);  // Set volume to 1
         console.log('Song is playing now!');
       }
     });
   } else {
-  
     if (!song.isPlaying()) {
       song.loop(); 
       song.setVolume(1);  
@@ -464,27 +477,31 @@ function startSound() {
     }
   }
 }
-
 //===============================================================================================================================================================
 function drawMessageStage() { // Stage 1
+  if (videoStarted) {
+    let sunriseWidth = 750
+    let sunriseHeight = 420
+    image(sunrise, -70, -20, sunriseWidth * 1.2, sunriseHeight * 1.2);  // Display video in top-left corner
+  }
   image(mainDesk, 0, -42, width, height * 1.08);
   fill(255, 255, 255, 150); 
   noStroke();
   rect(0, 0, windowWidth, windowHeight); 
 
   // Center the message box
-  let boxWidth = windowWidth * 0.5;  
-  let boxHeight = windowHeight * 0.5; 
-  let boxX = (windowWidth - boxWidth) / 2; 
-  let boxY = (windowHeight - boxHeight) / 2;  
+  let boxWidth = 780
+  let boxHeight = 450
+  let boxX = width / 2 - boxWidth / 2;
+  let boxY = height / 2 - boxHeight / 2; 
   // Draw the message box 
   fill(0);
   rect(boxX, boxY, boxWidth, boxHeight, 5);
-
-
+  
+  //words
   fill(255);  
   textAlign(CENTER, CENTER);  
-  textSize(windowWidth * 0.05);
+  textSize(80);
   
   let line1 = "I dont have much ";
   let line2 = "homework, but I should ";
@@ -506,8 +523,8 @@ function drawMessageStage() { // Stage 1
   let buttonWidth = 150; 
   let buttonHeight = 50; 
 
-  let buttonX = (windowWidth - buttonWidth) / 2;  
-  let buttonY = boxY + boxHeight - 65;  
+  let buttonX = width / 2 - buttonWidth / 2;
+  let buttonY = width / 2.36 - buttonWidth / 2;
 
   // View Tasks Button hover area
   let viewTasksButtonHovered = mouseX >= buttonX && mouseX <= buttonX + buttonWidth &&
@@ -542,29 +559,30 @@ function drawTasksStage() {  // Stage 3
   background(200); 
 
   if (videoStarted) {
-    let sunriseWidth = windowWidth * 0.5;
-    let sunriseHeight = sunrise.height * (sunriseWidth / sunrise.width);
+    let sunriseWidth = 750
+    let sunriseHeight = 420
     image(sunrise, -70, -20, sunriseWidth * 1.2, sunriseHeight * 1.2);  
   }
 
+
   // Display the main desk image
   image(mainDesk, 0, -42, width, height * 1.08);
+  image(taskPage, 0, -42, width, height * 1.08);
 
- 
-  let tasksWidth = windowWidth * 0.8;
-  let tasksHeight = tasks.height * (tasksWidth / tasks.width);
-  let tasksX = (windowWidth - tasksWidth) / 2;
-  let tasksY = (windowHeight - tasksHeight) / 2;
-  image(tasks, tasksX, tasksY, tasksWidth, tasksHeight);  // Display the tasks image centered
+  let tasksWidth = 400;
+  let tasksHeight = 706;
+  let tasksX = width / 2 - tasksWidth / 2;
+  let tasksY = height / 2 - tasksHeight / 2;
+  
 
   let taskContainerX = 620;  
-  let taskContainerY = tasksY + 175;  
+  let taskContainerY = tasksY + 164;  
   let taskContainerWidth = windowWidth / 2;
   let taskContainerHeight = windowHeight * 0.4;
 
   // Starting position for tasks
   let taskY = taskContainerY + 10;
-  let lineSpacing = 34;
+  let lineSpacing = 35;
 
   textFont(myFont);
   textAlign(LEFT, TOP);
@@ -601,6 +619,9 @@ function drawTasksStage() {  // Stage 3
     }
     handleFlashingText();
   }
+  textFont(bandiFont);
+  textSize(26);
+  drawProgressBar("Tasks", currentProgress, width - 50, height / 2);
 }
 //===============================================================================================================================================================
 function drawEssayStage() {  // Stage 4
@@ -609,9 +630,9 @@ function drawEssayStage() {  // Stage 4
 
     // Display video if it's started
     if (videoStarted) {
-      let sunriseWidth = windowWidth * 0.5;
-      let sunriseHeight = sunrise.height * (sunriseWidth / sunrise.width);
-      image(sunrise, -450, -20, sunriseWidth * 1.2, sunriseHeight * 1.2);  // Display video in top-left corner
+      let sunriseWidth = 750
+      let sunriseHeight = 420
+      image(sunrise, -450, -10, sunriseWidth * 1.2, sunriseHeight * 1.2);  // Display video in top-left corner
     }
 
 
@@ -672,7 +693,9 @@ function drawEssayStage() {  // Stage 4
     updateWordCount();
     displayWordCount();
   }
-  
+  textFont(bandiFont);
+  textSize(26);
+  drawProgressBar("Tasks", currentProgress, width - 50, height / 2);
 }
 function submitEssay() {
 
@@ -687,9 +710,9 @@ function drawDiscussionStage() { //stage 5
   background(200);
 
   if (videoStarted) {
-    let sunriseWidth = windowWidth * 0.5;
-    let sunriseHeight = sunrise.height * (sunriseWidth / sunrise.width);
-    image(sunrise, -450, -20, sunriseWidth * 1.2, sunriseHeight * 1.2);  // Display video in top-left corner
+    let sunriseWidth = 750
+    let sunriseHeight = 420
+    image(sunrise, -450, -10, sunriseWidth * 1.2, sunriseHeight * 1.2);  // Display video in top-left corner
   }
   if (!discussInput) {
     discussInput = createElement('textarea', '');
@@ -748,6 +771,10 @@ function drawDiscussionStage() { //stage 5
     submitDiscuss();  // Trigger the submit action when clicked
   }
   handleFlashingText();
+
+  textFont(bandiFont);
+  textSize(26);
+  drawProgressBar("Tasks", currentProgress, width - 50, height / 2);
 }
 function submitDiscuss() {
   if (discussInput) {
@@ -766,7 +793,7 @@ function drawArtSketchStage() { //stage 6
 
   image(sketchLayer, 0, 0);
 
-  image(pencil, mouseX - pencil.width / 3.2, mouseY - pencil.height / 1.099);
+  
 
   fill(255, 255, 255, 0);  
   noStroke();
@@ -796,7 +823,7 @@ function drawArtSketchStage() { //stage 6
     fill("#f2c6b3");  
     rect(buttonX, buttonY, buttonWidth, buttonHeight, 4);  
     fill(0);
-    text('Submit', 1120, 693.5);  
+    text('Submit',1120, 693.5);  
   } else {
     cursor(ARROW);  
   }
@@ -811,7 +838,14 @@ function drawArtSketchStage() { //stage 6
       mouseY >= drawingAreaY && mouseY <= drawingAreaY + drawingAreaHeight) {
     drawOnCanvas(mouseX, mouseY);
   }
+  
+  image(pencil, mouseX - pencil.width / 3.2, mouseY - pencil.height / 1.099);
+
   handleFlashingText();
+
+  textFont(bandiFont);
+  textSize(26);
+  drawProgressBar("Tasks", currentProgress, width - 50, height / 2);
 }
 function drawOnCanvas(x, y) {
   
@@ -866,5 +900,16 @@ function removeTaskFromList() {
 
     taskList.splice(0, 1);  
     updateTaskListDiv();  
+  }
+}
+function keyPressed() {
+  if (key === '1') {  // Simulate progress in tasks
+    overallProgress = min(overallProgress + 0.1, 1);  // Increase overall progress
+  } else if (key === '2') {  // Simulate progress in essay
+    overallProgress = min(overallProgress + 0.1, 1);  // Increase overall progress
+  } else if (key === '3') {  // Simulate progress in discuss
+    overallProgress = min(overallProgress + 0.1, 1);  // Increase overall progress
+  } else if (key === '4') {  // Simulate progress in art sketch
+    overallProgress = min(overallProgress + 0.1, 1);  // Increase overall progress
   }
 }
