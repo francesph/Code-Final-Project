@@ -173,6 +173,49 @@ function setup() {
   
   sketchLayer = createGraphics(width, height);
 }
+function addTask(task) {
+  taskList.push(task);  // Add a new task
+  updateProgressBar();  // Update the progress bar
+}
+function removeTaskFromList() {
+  if (taskList.length > 0) {
+    taskList.splice(0, 1);  // Remove the first task
+    updateProgressBar();  // Update the progress bar
+  }
+}
+function updateProgressBar() {
+  // You can call this whenever the task list is updated
+  let totalWidth = 400;  // Width of the progress bar
+  let height = 20;  // Height of the progress bar
+  drawProgressBar("Tasks", taskList, 50, 50, totalWidth, height); // Adjust x, y, and size as needed
+}
+function drawProgressBar(label, taskList, x, y, width, height) {
+  let numTasks = taskList.length;
+  let maxTasks = 12; // Maximum number of tasks (when the bar reaches 0%)
+  
+  // Calculate progress: As tasks increase, progress decreases from 100% to 0%.
+  let progress = (maxTasks - numTasks) / maxTasks;
+
+  // Draw the background of the progress bar (full height)
+  fill(200);  // Light gray background
+  noStroke();
+  rect(x, y - height / 2, width, height,4);  // Full bar (vertical)
+
+  // Draw the filled portion of the progress bar (grows upwards as tasks decrease)
+  fill("#4CAF50");  // Green for the filled part
+  let filledHeight = height * progress;
+  rect(x, y - height / 2 + height - filledHeight, width, filledHeight,4);  // Filled part (grows upwards)
+
+  // Draw the label above the bar (centered horizontally)
+  fill(0);
+  textSize(16);
+  textAlign(CENTER, CENTER);
+  text(label, x + width / 2, y - height / 2 - 20);  // Label placed slightly above the bar
+
+  // Draw the percentage inside the bar
+  textSize(14);
+  text(Math.round(progress * 100) + "%", x + width / 2, y);  // Show percentage inside the bar
+}
 
 function draw() {
   // Display the video on all stages if it's started
@@ -196,7 +239,7 @@ function draw() {
       drawTasksStage();
       updateDayCounter();
       drawDayCounter();
-      
+      drawProgressBar("Tasks", taskList, width - 55, height / 2, 30, 500);
       // clock();
       break;
     case 4: // Essay stage
@@ -204,47 +247,27 @@ function draw() {
       updateDayCounter();
       drawDayCounter();
       clock();
-     
+      drawProgressBar("Tasks", taskList, width - 55, height / 2, 30, 500);
       break;
     case 5: // Discussion Board stage
       drawDiscussionStage();
       updateDayCounter();
       drawDayCounter();
       clock();
-     
+      drawProgressBar("Tasks", taskList, width - 55, height / 2, 30, 500);
       break;
     case 6: // Art Sketch stage
       drawArtSketchStage();
       updateDayCounter();
       drawDayCounter();
-      
+      drawProgressBar("Tasks", taskList, width - 55, height / 2, 30, 500);
       break;
   }
   let progressSpeed = 0.05;  // How quickly the bar fills up (higher value = faster)
   currentProgress = lerp(currentProgress, overallProgress, progressSpeed);
 }
-function drawProgressBar(stageName, progress, x, y) {
-  let barWidth = 30;  // The width of the progress bar (making it vertical)
-  let barHeight = 500;  // The height of the progress bar (can be adjusted)
-  
-  // Draw the background of the progress bar
-  fill(200);  // Light gray color for the background of the bar
-  noStroke();
-  rect(x - barWidth / 2, y - barHeight / 2, barWidth, barHeight); // Centered vertically and aligned to the right
 
-  // Draw the progress fill (based on progress value), starting from the bottom
-  fill(0, 200, 0);  // Green color for the progress
-  let progressHeight = barHeight * progress; // Height of the filled section
-  rect(x - barWidth / 2, y + barHeight / 2 - progressHeight, barWidth, progressHeight); // Starting from the bottom
 
-  // Draw the stage name and the progress percentage
-  fill(0);
-  textSize(18);
-  textAlign(CENTER, CENTER);
-  text(stageName, x, y - barHeight / 2 - 20);  // Draw the stage name above the bar
-  textSize(14);
-  text(Math.round(progress * 100) + "%", x, y);  // Draw progress percentage at the center of the bar
-}
 function updateWordCount() {
 
   let inputText = essayInput.value();
@@ -424,9 +447,8 @@ function updateTaskListDiv() {
     taskListDiv.child(taskDiv);
   }
 }
-function removeTask(index) {
-  taskList.splice(index, 1);
-}
+
+
 //===============================================================================================================================================================
 function drawStartPage() {
   image(start, 0, 0, width, height);
@@ -875,7 +897,6 @@ function drawButton(x, y, w, h, label, callback) {
     callback();  
   }
 }
-
 //===============================================================================================================================================================
 function updateEssayText() {
 
@@ -892,6 +913,7 @@ function mousePressed() {
     videoStarted = true;
     sunrise.play();
   }
+  
 }
 //===============================================================================================================================================================
 function removeTaskFromList() {
