@@ -463,8 +463,6 @@ function updateTaskListDiv() {
     taskListDiv.child(taskDiv);
   }
 }
-
-
 //===============================================================================================================================================================
 function drawStartPage() {
   image(start, 0, 0, width, height);
@@ -847,7 +845,7 @@ function drawArtSketchStage() { //stage 6
     fill("#f2c6b3");  
     rect(buttonX, buttonY, buttonWidth, buttonHeight, 4);  
     fill(0);
-    text('Submit', buttonX + buttonWidth / 2, buttonY + buttonHeight / 2);  // Centered text
+    text('Submit', buttonX + buttonWidth / 2, buttonY + buttonHeight / 2.3);  // Centered text
   } else {
     cursor(ARROW);  
   }
@@ -883,7 +881,6 @@ function submitArtSketch() {
   isArtSketchStageEntered = false;  
 }
 //===============================================================================================================================================================
-
 //===============================================================================================================================================================
 function drawButton(x, y, w, h, label, callback) {
   let buttonHovered = mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h;
