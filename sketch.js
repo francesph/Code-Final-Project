@@ -9,6 +9,8 @@ let tasks;
 
 let overallProgress = 0;  // Start at 0% progress
 let currentProgress = 0;  // smooth transitions
+let targetProgress = 0;   // Target progress of the bar (based on task completion)
+let progressSpeed = 0.05;
 
 let taskPage;
 let taskList = []; // Start with an empty task list
@@ -73,7 +75,7 @@ let areaWidth = 892;
 let areaHeight = 430;
 
 let lastFlashTime = 0;
-let flashInterval = 1000; // flash (1 second)
+let flashInterval = 2000; // flash (1 second)
 let flashMessages = [
   "Work faster!",
   "Are you lazy? You should be done by now!",
@@ -190,32 +192,41 @@ function updateProgressBar() {
   drawProgressBar("Tasks", taskList, 50, 50, totalWidth, height); // Adjust x, y, and size as needed
 }
 function drawProgressBar(label, taskList, x, y, width, height) {
-  let numTasks = taskList.length;
-  let maxTasks = 12; // Maximum number of tasks (when the bar reaches 0%)
+  let numTasks = taskList.length;    
+  let maxTasks = 12;                 
   
-  // Calculate progress: As tasks increase, progress decreases from 100% to 0%.
-  let progress = (maxTasks - numTasks) / maxTasks;
+  // Calculate progress: As the number of tasks increases, progress decreases from 100% to 0%
+  let newProgress = (maxTasks - numTasks) / maxTasks;  // Target progress value
+  
+  targetProgress = newProgress;
+  currentProgress = lerp(currentProgress, targetProgress, 0.1);  
 
-  // Draw the background of the progress bar (full height)
+  let filledHeight = height * currentProgress;
+  
   fill(200);  // Light gray background
   noStroke();
-  rect(x, y - height / 2, width, height,4);  // Full bar (vertical)
+  rect(x, y - height / 2, width, height, 4);  // Full bar (vertical)
 
-  // Draw the filled portion of the progress bar (grows upwards as tasks decrease)
-  fill("#4CAF50");  // Green for the filled part
-  let filledHeight = height * progress;
-  rect(x, y - height / 2 + height - filledHeight, width, filledHeight,4);  // Filled part (grows upwards)
+//(lerp red and green)
+  let startColor = color(255, 0, 0);  // Red (start)
+  let endColor = color(0, 255, 0);    // Green (end)
+  let gradientColor = lerpColor(startColor, endColor, currentProgress);  // Get color at current progress
 
-  // Draw the label above the bar (centered horizontally)
+  fill(gradientColor); 
+  rect(x, y - height / 2 + height - filledHeight, width, filledHeight, 4);  
+
+  
   fill(0);
   textSize(16);
   textAlign(CENTER, CENTER);
-  text(label, x + width / 2, y - height / 2 - 20);  // Label placed slightly above the bar
+  text(label, x + width / 2, y - height / 2 - 20);  
+  
 
-  // Draw the percentage inside the bar
   textSize(14);
-  text(Math.round(progress * 100) + "%", x + width / 2, y);  // Show percentage inside the bar
+  fill(0);  // White text for better contrast
+  text(Math.round(currentProgress * 100) + "%", x + width / 2, y);  // Percentage inside the bar
 }
+
 
 function draw() {
   // Display the video on all stages if it's started
@@ -224,7 +235,7 @@ function draw() {
     let sunriseHeight = 420
     image(sunrise, -70, -20, sunriseWidth * 1.2, sunriseHeight * 1.2);  // Display video in top-left corner
   }
-
+  currentProgress = lerp(currentProgress, targetProgress, progressSpeed);
   switch(stage) {
     case 0: // Start page
       drawStartPage();
@@ -239,6 +250,8 @@ function draw() {
       drawTasksStage();
       updateDayCounter();
       drawDayCounter();
+      textFont(bandiFont);
+      textSize(26);
       drawProgressBar("Tasks", taskList, width - 55, height / 2, 30, 500);
       // clock();
       break;
@@ -247,6 +260,8 @@ function draw() {
       updateDayCounter();
       drawDayCounter();
       clock();
+      textFont(bandiFont);
+      textSize(26);
       drawProgressBar("Tasks", taskList, width - 55, height / 2, 30, 500);
       break;
     case 5: // Discussion Board stage
@@ -254,19 +269,20 @@ function draw() {
       updateDayCounter();
       drawDayCounter();
       clock();
+      textFont(bandiFont);
+      textSize(26);
       drawProgressBar("Tasks", taskList, width - 55, height / 2, 30, 500);
       break;
     case 6: // Art Sketch stage
       drawArtSketchStage();
       updateDayCounter();
       drawDayCounter();
+      textFont(bandiFont);
+      textSize(26);
       drawProgressBar("Tasks", taskList, width - 55, height / 2, 30, 500);
       break;
   }
-  let progressSpeed = 0.05;  // How quickly the bar fills up (higher value = faster)
-  currentProgress = lerp(currentProgress, overallProgress, progressSpeed);
 }
-
 
 function updateWordCount() {
 
@@ -641,9 +657,6 @@ function drawTasksStage() {  // Stage 3
     }
     handleFlashingText();
   }
-  textFont(bandiFont);
-  textSize(26);
-  drawProgressBar("Tasks", currentProgress, width - 50, height / 2);
 }
 //===============================================================================================================================================================
 function drawEssayStage() {  // Stage 4
@@ -715,9 +728,6 @@ function drawEssayStage() {  // Stage 4
     updateWordCount();
     displayWordCount();
   }
-  textFont(bandiFont);
-  textSize(26);
-  drawProgressBar("Tasks", currentProgress, width - 50, height / 2);
 }
 function submitEssay() {
 
@@ -793,10 +803,6 @@ function drawDiscussionStage() { //stage 5
     submitDiscuss();  // Trigger the submit action when clicked
   }
   handleFlashingText();
-
-  textFont(bandiFont);
-  textSize(26);
-  drawProgressBar("Tasks", currentProgress, width - 50, height / 2);
 }
 function submitDiscuss() {
   if (discussInput) {
@@ -811,64 +817,58 @@ function drawArtSketchStage() { //stage 6
   
   // Draw the sketch background
   image(sketch, 0, 0, width, height);
-
-
   image(sketchLayer, 0, 0);
-
-  
 
   fill(255, 255, 255, 0);  
   noStroke();
   rect(drawingAreaX, drawingAreaY, drawingAreaWidth, drawingAreaHeight);  
-  
+
   // Button styling
   fill("#e6aa90");
   rect(1100, 689.5, 83.5, 24.5, 4);  
   textFont(bandiFont);
   textSize(15.5);
   fill(0);
-  text('Submit', 1120, 693.5);  // Button text
 
-  // Button position and size
   let buttonX = 1100;
   let buttonY = 689.5;
   let buttonWidth = 83.5;
   let buttonHeight = 24.5;
+  
+  textAlign(CENTER, CENTER); 
+  text('Submit', buttonX + buttonWidth / 2, buttonY + buttonHeight / 2.3);  // Centered text
 
   // Check if the mouse is hovering over the button
   let buttonHovered = mouseX >= buttonX && mouseX <= buttonX + buttonWidth &&
                       mouseY >= buttonY && mouseY <= buttonY + buttonHeight;
-
 
   if (buttonHovered) {
     cursor(HAND);  
     fill("#f2c6b3");  
     rect(buttonX, buttonY, buttonWidth, buttonHeight, 4);  
     fill(0);
-    text('Submit',1120, 693.5);  
+    text('Submit', buttonX + buttonWidth / 2, buttonY + buttonHeight / 2);  // Centered text
   } else {
     cursor(ARROW);  
   }
 
- 
+  // Submit the art sketch when the button is clicked
   if (buttonHovered && mouseIsPressed) {
     submitArtSketch(); 
   }
-  
 
   if (mouseIsPressed && mouseX >= drawingAreaX && mouseX <= drawingAreaX + drawingAreaWidth &&
       mouseY >= drawingAreaY && mouseY <= drawingAreaY + drawingAreaHeight) {
     drawOnCanvas(mouseX, mouseY);
   }
   
+  
   image(pencil, mouseX - pencil.width / 3.2, mouseY - pencil.height / 1.099);
 
+  // Handle flashing text if needed
   handleFlashingText();
-
-  textFont(bandiFont);
-  textSize(26);
-  drawProgressBar("Tasks", currentProgress, width - 50, height / 2);
 }
+
 function drawOnCanvas(x, y) {
   
   sketchLayer.stroke(0);  
