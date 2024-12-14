@@ -394,7 +394,7 @@ function drawDayCounter() {
 }
 function startGeneratingTasks() {
 
-  let randomInterval = random(1000, 1000); //1-10 seconds
+  let randomInterval = random(1000, 10000); //1-10 seconds
 
   taskGenerationTimer = setTimeout(() => {
     generateTask();  
